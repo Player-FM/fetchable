@@ -1,0 +1,2 @@
+dog:
+  url: "<%= Dummy::test_file(name: 'dog.jpg') %>"

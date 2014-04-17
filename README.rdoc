@@ -1,0 +1,7 @@
+= Fetchable
+
+This project rocks and uses MIT-LICENSE.
+
+Photo credits:
+
+<a href="http://www.flickr.com/photos/90081206@N00/13091907294/">Kyra Savolainen</a>
