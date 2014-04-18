@@ -20,10 +20,12 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails", "~> 4.1.0"
   s.add_dependency "hashie"
+  s.add_dependency "excon"
 
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "addressable"
   s.add_development_dependency "byebug"
   s.add_development_dependency "single_test"
+  s.add_development_dependency "timecop"
 
 end

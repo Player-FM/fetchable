@@ -20,10 +20,11 @@ Fetchable retains call results for you.
     image = image.create(url: 'http://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png')
     image.fetch
     puts image.resource.size # 12345
+    puts image.live_resource? # true
 
 ### Re-fetch example
 
-Fetchable conserves energy. eTags and modified timestamp standards are
+Fetchable conserves energy. HTTP "memento" standards (eTags and timestamp) are
 leveraged to avoid unnecessarily repeating stuff.
 
     image.fetch # first fetch creates a resource record
@@ -31,7 +32,8 @@ leveraged to avoid unnecessarily repeating stuff.
 
 ### Callback example
 
-Fetchable 
+Fetchable calls your ActiveRecord when stuff happens, just like the usual
+ActiveRecord callbacks.
 
     class Image < ActiveRecord::Base
 
@@ -39,11 +41,26 @@ Fetchable
 
       before_fetch :cancel_if_server_too_busy
       after_new_fetch :save_image_dimensions
-      after_error_fetch :report_crash
+      fetch_error :report_problem
       after_redirect :save_url_alias
       after_fetch :log_fetch
 
     end
+
+### Fetch management
+
+Fetchable helps you schedule recurring fetches.
+
+    class Image
+      refetching({
+        repeat: 1.day,       # minimum repeat wait after success
+        retry: 1.hour,       # minimum repeat after error (decays exponentially)
+        fresh_repeat: 1.week # minimum "fresh" refetch after success (ie ignore mementos)
+        fresh_retry: 1.day   # minimum "fresh" retry after error (ie ignore mementos)
+      })
+    end
+
+    Image.ready_for_repeat.each { |i| i.fetch(hard: true) }
 
 ### Future plans
 

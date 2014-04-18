@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 2) do
     t.integer  "size"
     t.string   "etag"
     t.string   "signature"
+    t.string   "redirected_to"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

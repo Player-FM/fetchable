@@ -11,13 +11,16 @@ module Fetchable
       })
     end
 
-    def assign_from_rest_response(response)
-      self.status_code = response.code
-      headers = self.class.extract_headers(response)
-      self.etag = headers.etag if headers.etag
-      self.last_modified = DateTime.parse(headers.last_modified) if headers.last_modified
+    def assign_from_rest_response(response, options, redirect_chain)
+      #self.status_code = response.code
+      #headers = self.class.extract_headers(response)
+      self.status_code = response.status
+      headers = Hashie::Mash.new(response.headers)
+      self.etag = headers.Etag if headers.Etag
+      self.last_modified = DateTime.parse(headers['Last-Modified']) if headers['Last-Modified']
       self.size = (response.body.length if response.body)
       self.signature = (Base64.strict_encode64(Digest::SHA256.new.digest(response.body)) if response.body)
+      self.redirected_to = redirect_chain.last
     end
 
   end

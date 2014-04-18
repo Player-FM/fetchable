@@ -15,6 +15,7 @@ class CreateResources < ActiveRecord::Migration
       t.integer :size
       t.string :etag
       t.string :signature
+      t.string :redirected_to
 
       # the usual
       t.timestamps
