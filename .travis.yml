@@ -4,4 +4,7 @@ rvm:
   - "2.0.0"
 env:
   - TESTDATA_HOST=testdata.player.fm
+before_install:
+  - cd test/dummy
+  - bin/blat.sh
 script: bundle exec rake
