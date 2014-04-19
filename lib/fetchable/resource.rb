@@ -47,8 +47,10 @@ module Fetchable
     end
 
     def assign_from_rest_response(response, options, redirect_chain)
+
       #self.status_code = response.code
       #headers = self.class.extract_headers(response)
+
       self.status_code = response.status
       headers = Hashie::Mash.new(response.headers)
       self.etag = headers.Etag if headers.Etag
@@ -56,6 +58,17 @@ module Fetchable
       self.size = (response.body.length if response.body)
       self.signature = (Base64.strict_encode64(Digest::SHA256.new.digest(response.body)) if response.body)
       self.redirected_to = redirect_chain.last
+
+      now = DateTime.now
+      if [200,304].include?(response.status)
+        self.fail_count = 0
+        self.fetched_at = now
+      else
+        self.failed_at = now
+      end
+
+      self.tried_at = now
+
     end
 
   end

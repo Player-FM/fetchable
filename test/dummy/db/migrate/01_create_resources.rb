@@ -17,6 +17,13 @@ class CreateResources < ActiveRecord::Migration
       t.string :signature
       t.string :redirected_to
 
+      # tracking
+      t.integer :fail_count
+      t.datetime :next_fetch_after
+      t.datetime :fetched_at
+      t.datetime :failed_at
+      t.datetime :tried_at
+
       # the usual
       t.timestamps
 

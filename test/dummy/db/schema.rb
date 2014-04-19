@@ -32,6 +32,11 @@ ActiveRecord::Schema.define(version: 2) do
     t.string   "etag"
     t.string   "signature"
     t.string   "redirected_to"
+    t.integer  "fail_count"
+    t.datetime "next_fetch_after"
+    t.datetime "fetched_at"
+    t.datetime "failed_at"
+    t.datetime "tried_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
