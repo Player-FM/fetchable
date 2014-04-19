@@ -19,7 +19,7 @@ class CreateResources < ActiveRecord::Migration
 
       # tracking
       t.integer :fail_count
-      t.datetime :next_fetch_after
+      t.datetime :next_try_after
       t.datetime :fetched_at
       t.datetime :failed_at
       t.datetime :tried_at

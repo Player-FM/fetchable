@@ -29,6 +29,7 @@ class ResourcePersistenceTest < ActiveSupport::TestCase
       assert_equal 0, @dog.resource.fail_count
       assert_equal @now, @dog.resource.tried_at
       assert_equal @now, @dog.resource.fetched_at
+      assert_equal @now+1.day, @dog.resource.next_try_after
     end
   end
 
@@ -47,6 +48,7 @@ class ResourcePersistenceTest < ActiveSupport::TestCase
       assert_equal 404, @dog.resource.status_code
       assert_equal @now, @dog.resource.tried_at
       assert_equal @now, @dog.resource.failed_at
+      assert_equal @now+1.hour, @dog.resource.next_try_after
     end
   end
 
