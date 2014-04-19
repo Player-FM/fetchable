@@ -2,10 +2,11 @@ language: ruby
 rvm:
   - 2.1.0
 env:
-  - TESTDATA_HOST=testdata.player.fm
   - DB=sqlite
 before_install:
+  - export TESTDATA_HOST='http://testdata.player.fm'
   - gem install rake
+  - bundle install
   - cd test/dummy
   #- bin/blat.sh
   - RAILS_ENV=test bundle exec rake db:migrate --trace
