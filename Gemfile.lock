@@ -108,6 +108,7 @@ DEPENDENCIES
   byebug
   fetchable!
   mocha
+  rake
   single_test
   sqlite3
   timecop
