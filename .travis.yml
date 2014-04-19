@@ -7,4 +7,5 @@ env:
 before_install:
   - cd test/dummy
   - bin/blat.sh
+  - cd ..
 script: bundle exec rake
