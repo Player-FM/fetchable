@@ -1,11 +1,14 @@
 language: ruby
 rvm:
-  - "1.9.3"
-  - "2.0.0"
+  - 2.1.0
 env:
   - TESTDATA_HOST=testdata.player.fm
+  - DB=sqlite
 before_install:
   - cd test/dummy
-  - bin/blat.sh
+  #- bin/blat.sh
+  - RAILS_ENV=test bundle exec rake db:migrate --trace
+  - bundle exec rake db:test:prepare
+  - bundler_args: --binstubs=./bundler_stubs
   - cd ../..
 script: bundle exec rake
