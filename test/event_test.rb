@@ -12,9 +12,4 @@ class EventTest < ActiveSupport::TestCase
     @dog.fetch
   end
 
-  def test_after_initial_fetch
-    #@dog.expects(:after_initial_fetch).expects(*args)
-    #@dog.fetch
-  end
-
 end

@@ -11,6 +11,41 @@ module Fetchable
       })
     end
 
+    def fetch(options={})
+      fetchable.call_callbacks :before_fetch
+      options = Hashie::Mash.new(options.reverse_merge(limit: 5))
+      deep_fetch(fetchable.url, [], options)
+      fetchable.call_callbacks :after_fetch
+    end
+
+    # http://shadow-file.blogspot.co.uk/2009/03/handling-http-redirection-in-ruby.html
+    def deep_fetch(url, redirect_chain, options)
+
+      # Set up call
+      headers = Hashie::Mash.new
+      headers['if-none-match'] = self.etag if self.etag.present?
+      headers['if-modified-since'] = self.last_modified.rfc2822 if self.last_modified.present?
+
+      resp = Excon.get(url, headers: headers)
+
+      if [301,302].include?(resp.status) and redirect_chain.size <= options.limit
+        new_url = resp.headers['location']
+        if URI.parse(new_url).relative?
+          old_url = Addressable::URI.parse(url)
+          port = '' if [old_url.port, old_url.scheme] == [80, 'http'] || [old_url.port, old_url.scheme] == [443, 'https']
+          new_url = "#{old_url.scheme}://#{old_url.host}:#{port}#{resp.headers['location']}"
+        end
+        # Use URI.parse() instead of raw URL because raw URL string includes
+        # unnecessary :80 and :443 port number
+        redirect_chain << URI.parse(new_url).to_s
+        deep_fetch new_url, redirect_chain, options
+      else
+        self.assign_from_rest_response(resp, options, redirect_chain)
+        self.save!
+      end
+
+    end
+
     def assign_from_rest_response(response, options, redirect_chain)
       #self.status_code = response.code
       #headers = self.class.extract_headers(response)

@@ -9,7 +9,7 @@ class RefetchTest < ActiveSupport::TestCase
     assert_not_nil @dog.resource.etag
   end
 
-  def test_no_mementos_means_full_refretch
+  def test_no_mementos_means_full_refetch
     @dog.url = Dummy::test_file(name: 'dog.jpg', etag: '_', last_modified: '_')
     @dog.fetch
     assert_equal 200, @dog.resource.status_code

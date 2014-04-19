@@ -79,3 +79,11 @@ example](https://github.com/playerfm/fetchable/blob/master/test/dummy/db/migrate
 
 For each of your fetchable classes, add a add an integer `resource_id` int
 column and a string 'url' column.
+
+### Contributing
+
+Contributions are welcome. Please include tests and ensure it passes [Travis](https://travis-ci.org/playerfm/fetchable).
+
+It's much faster to run tests locally by running the
+[testdata](https://github.com/playerfm/testdata) server locally, but it works
+fine using the remote version too.
