@@ -5,18 +5,43 @@ require 'byebug'
 
 module Fetchable
 
-  def self.included(base)
-    base.extend(ClassMethods)
-    base.has_one :resource, class_name: 'Fetchable::Resource', foreign_key: 'fetchable_id', as: :fetchable
+  extend ActiveSupport::Concern
+
+  included do
+    has_one :resource, class_name: 'Fetchable::Resource', foreign_key: 'fetchable_id', as: :fetchable
   end
 
   module ClassMethods
-    #def 
+
+    cattr_accessor :callbacks
+
+    def add_callback(event, handler)
+      # ensure
+      self.callbacks||=Hashie::Mash.new
+      self.callbacks[event]||=[]
+      # add
+      self.callbacks[event] << handler
+    end
+
+    %w(before_fetch after_fetch).each { |callback|
+      define_method(callback.to_sym) { |handler| add_callback(callback.to_sym, handler) }
+    }
+
+  end
+
+  module InstanceMethods
   end
 
   def fetch(options={})
+    #self.class.callbacks.before_fetch.each { |c| self.send(c) }
+    call_callbacks :before_fetch
     options = Hashie::Mash.new(options.reverse_merge(limit: 5))
     deep_fetch(self.url, [], options)
+    call_callbacks :after_fetch
+  end
+
+  def call_callbacks(event)
+    self.class.callbacks[event].each { |c| self.send(c) }
   end
     
   private

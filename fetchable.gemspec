@@ -19,13 +19,10 @@ Gem::Specification.new do |s|
   s.test_files = Dir["test/**/*"]
 
   s.add_dependency "rails", "~> 4.1.0"
-  s.add_dependency "hashie"
-  s.add_dependency "excon"
+  %w(hashie excon)
+  .each { |lib| s.add_dependency lib }
 
-  s.add_development_dependency "sqlite3"
-  s.add_development_dependency "addressable"
-  s.add_development_dependency "byebug"
-  s.add_development_dependency "single_test"
-  s.add_development_dependency "timecop"
+  %w(sqlite3 addressable byebug single_test timecop mocha)
+  .each { |lib| s.add_development_dependency lib }
 
 end

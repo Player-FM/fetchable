@@ -15,7 +15,7 @@ class ResourcePersistenceTest < ActiveSupport::TestCase
     assert_nil @dog.resource
     @dog.fetch
     assert_not_nil @dog.resource
-    assert_equal @dog, @dog.resource.fetchable
+    assert @dog.resource.fetchable==@dog
   end
 
   def test_resource_attribs

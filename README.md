@@ -60,7 +60,7 @@ Fetchable helps you schedule recurring fetches.
       })
     end
 
-    Image.ready_for_repeat.each { |i| i.fetch(hard: true) }
+    Image.due_for_repeat_fetch.each { |i| i.fetch(hard: true) }
 
 ### Future plans
 
