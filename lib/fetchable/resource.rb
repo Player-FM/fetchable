@@ -63,8 +63,11 @@ module Fetchable
       if [200,304].include?(response.status)
         self.fail_count = 0
         self.fetched_at = now
+        self.refetched_at = now if response.status==304
         self.next_try_after = now+1.day
       else
+        self.fail_count ||= 0
+        self.fail_count += 1
         self.failed_at = now
         self.next_try_after = now+1.hour
       end

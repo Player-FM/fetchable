@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'timecop'
 
 class ResourcePersistenceTest < ActiveSupport::TestCase
 
@@ -42,9 +41,12 @@ class ResourcePersistenceTest < ActiveSupport::TestCase
       greeting.url = Dummy::test_file(name: 'does-not-exist')
       greeting.fetch
       assert_equal 404, greeting.resource.status_code
+      assert_equal 1, greeting.resource.fail_count
       assert_equal now, greeting.resource.tried_at
       assert_equal now, greeting.resource.failed_at
       assert_equal now+1.hour, greeting.resource.next_try_after
+      greeting.fetch
+      assert_equal 2, greeting.resource.fail_count
     end
   end
 

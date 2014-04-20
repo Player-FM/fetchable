@@ -31,9 +31,10 @@ ActiveRecord::Schema.define(version: 2) do
     t.string   "etag"
     t.string   "fingerprint"
     t.string   "redirected_to"
-    t.integer  "fail_count"
+    t.integer  "fail_count",     default: 0
     t.datetime "next_try_after"
     t.datetime "fetched_at"
+    t.datetime "refetched_at"
     t.datetime "failed_at"
     t.datetime "tried_at"
     t.datetime "created_at"

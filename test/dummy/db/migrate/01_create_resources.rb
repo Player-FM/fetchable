@@ -18,9 +18,10 @@ class CreateResources < ActiveRecord::Migration
       t.string :redirected_to
 
       # tracking
-      t.integer :fail_count
+      t.integer :fail_count, default: 0, nil: false
       t.datetime :next_try_after
       t.datetime :fetched_at
+      t.datetime :refetched_at
       t.datetime :failed_at
       t.datetime :tried_at
 

@@ -14,9 +14,13 @@ class RefetchTest < ActiveSupport::TestCase
   end
 
   def test_etag_means_minimal_refetch
-    greeting.url = Dummy::test_file(name: 'greeting.txt', last_modified: '_')
-    greeting.fetch
-    assert_equal 304, greeting.resource.status_code
+    assert_nil greeting.resource.refetched_at
+    Timecop.freeze(now) do
+      greeting.url = Dummy::test_file(name: 'greeting.txt', last_modified: '_')
+      greeting.fetch
+      assert_equal 304, greeting.resource.status_code
+      assert_equal now, greeting.resource.refetched_at
+    end
   end
 
   def test_modified_since_means_minimal_refetch
