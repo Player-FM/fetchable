@@ -18,8 +18,8 @@ end
 class ActiveSupport::TestCase
   fixtures :all
 
-  def dog
-    images(:dog)
+  def greeting
+    documents(:greeting)
   end
 
   def now

@@ -13,11 +13,10 @@
 
 ActiveRecord::Schema.define(version: 2) do
 
-  create_table "images", force: true do |t|
+  create_table "documents", force: true do |t|
     t.integer  "resource_id"
     t.string   "url"
-    t.string   "width"
-    t.string   "height"
+    t.integer  "word_count"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

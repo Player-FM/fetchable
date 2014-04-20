@@ -1,4 +1,4 @@
-class Image < ActiveRecord::Base
+class Document < ActiveRecord::Base
 
   include Fetchable
   

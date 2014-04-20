@@ -3,48 +3,48 @@ require 'timecop'
 
 class ResourcePersistenceTest < ActiveSupport::TestCase
 
-  DOG_ETAG = '"0ce56d0a6e9baa0c5d170001592c9b9c65d19276"'
-  DOG_LAST_MODIFIED = 1391848200
-  DOG_SIZE = 5
-  DOG_FINGERPRINT = 'Wab4pWDcin+Z9HBXC8wQD1DkFZIvv3GievNMVjDPIzo='
+  GREETING_ETAG = '"0ce56d0a6e9baa0c5d170001592c9b9c65d19276"'
+  GREETING_LAST_MODIFIED = 1391848200
+  GREETING_SIZE = 5
+  GREETING_FINGERPRINT = 'Wab4pWDcin+Z9HBXC8wQD1DkFZIvv3GievNMVjDPIzo='
 
   def test_first_fetch_creates_resource
-    assert_nil dog.resource
-    dog.fetch
-    assert_not_nil dog.resource
-    assert dog.resource.fetchable==dog
+    assert_nil greeting.resource
+    greeting.fetch
+    assert_not_nil greeting.resource
+    assert greeting.resource.fetchable==greeting
   end
 
   def test_resource_attribs
     Timecop.freeze(now) do
-      dog.fetch
-      assert_equal 200, dog.resource.status_code
-      assert_equal DOG_ETAG, dog.resource.etag
-      assert_equal DOG_SIZE, dog.resource.size
-      assert_equal DOG_FINGERPRINT, dog.resource.fingerprint
-      assert_equal 0, dog.resource.fail_count
-      assert_equal now, dog.resource.tried_at
-      assert_equal now, dog.resource.fetched_at
-      assert_equal now+1.day, dog.resource.next_try_after
+      greeting.fetch
+      assert_equal 200, greeting.resource.status_code
+      assert_equal GREETING_ETAG, greeting.resource.etag
+      assert_equal GREETING_SIZE, greeting.resource.size
+      assert_equal GREETING_FINGERPRINT, greeting.resource.fingerprint
+      assert_equal 0, greeting.resource.fail_count
+      assert_equal now, greeting.resource.tried_at
+      assert_equal now, greeting.resource.fetched_at
+      assert_equal now+1.day, greeting.resource.next_try_after
     end
   end
 
   def test_blank_resource_attribs
-    dog.url = Dummy::test_file(etag: '_', last_modified: '_')
-    dog.fetch
-    assert_equal 200, dog.resource.status_code
-    assert_equal nil, dog.resource.etag
-    assert_equal nil, dog.resource.last_modified
+    greeting.url = Dummy::test_file(etag: '_', last_modified: '_')
+    greeting.fetch
+    assert_equal 200, greeting.resource.status_code
+    assert_equal nil, greeting.resource.etag
+    assert_equal nil, greeting.resource.last_modified
   end
 
   def test_blank_resource_attribs
     Timecop.freeze(now) do
-      dog.url = Dummy::test_file(name: 'does-not-exist')
-      dog.fetch
-      assert_equal 404, dog.resource.status_code
-      assert_equal now, dog.resource.tried_at
-      assert_equal now, dog.resource.failed_at
-      assert_equal now+1.hour, dog.resource.next_try_after
+      greeting.url = Dummy::test_file(name: 'does-not-exist')
+      greeting.fetch
+      assert_equal 404, greeting.resource.status_code
+      assert_equal now, greeting.resource.tried_at
+      assert_equal now, greeting.resource.failed_at
+      assert_equal now+1.hour, greeting.resource.next_try_after
     end
   end
 

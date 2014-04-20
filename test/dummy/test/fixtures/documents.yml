@@ -1,2 +1,2 @@
-dog:
+greeting:
   url: "<%= Dummy::test_file(name: 'greeting.txt') %>"
