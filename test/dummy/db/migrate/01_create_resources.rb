@@ -14,7 +14,7 @@ class CreateResources < ActiveRecord::Migration
       t.datetime :last_modified
       t.integer :size
       t.string :etag
-      t.string :signature
+      t.string :fingerprint
       t.string :redirected_to
 
       # tracking

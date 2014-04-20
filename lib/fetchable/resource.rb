@@ -56,7 +56,7 @@ module Fetchable
       self.etag = headers.Etag if headers.Etag
       self.last_modified = DateTime.parse(headers['Last-Modified']) if headers['Last-Modified']
       self.size = (response.body.length if response.body)
-      self.signature = (Base64.strict_encode64(Digest::SHA256.new.digest(response.body)) if response.body)
+      self.fingerprint = (Base64.strict_encode64(Digest::SHA256.new.digest(response.body)) if response.body)
       self.redirected_to = redirect_chain.last
 
       now = DateTime.now

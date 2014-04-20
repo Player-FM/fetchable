@@ -30,7 +30,7 @@ ActiveRecord::Schema.define(version: 2) do
     t.datetime "last_modified"
     t.integer  "size"
     t.string   "etag"
-    t.string   "signature"
+    t.string   "fingerprint"
     t.string   "redirected_to"
     t.integer  "fail_count"
     t.datetime "next_try_after"

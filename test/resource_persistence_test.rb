@@ -3,10 +3,10 @@ require 'timecop'
 
 class ResourcePersistenceTest < ActiveSupport::TestCase
 
-  DOG_ETAG = '"cee1cac995540c33e06d792e077297bd31e7e504"'
+  DOG_ETAG = '"0ce56d0a6e9baa0c5d170001592c9b9c65d19276"'
   DOG_LAST_MODIFIED = 1391848200
-  DOG_SIZE = 20997
-  DOG_SIGNATURE = 'siNHt2UDgfCAwhga/x8nQm3HKXKSrVrLk1U+GtyvYrA='
+  DOG_SIZE = 5
+  DOG_FINGERPRINT = 'Wab4pWDcin+Z9HBXC8wQD1DkFZIvv3GievNMVjDPIzo='
 
   def test_first_fetch_creates_resource
     assert_nil dog.resource
@@ -21,6 +21,7 @@ class ResourcePersistenceTest < ActiveSupport::TestCase
       assert_equal 200, dog.resource.status_code
       assert_equal DOG_ETAG, dog.resource.etag
       assert_equal DOG_SIZE, dog.resource.size
+      assert_equal DOG_FINGERPRINT, dog.resource.fingerprint
       assert_equal 0, dog.resource.fail_count
       assert_equal now, dog.resource.tried_at
       assert_equal now, dog.resource.fetched_at
