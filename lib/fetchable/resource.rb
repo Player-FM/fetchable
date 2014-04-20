@@ -1,9 +1,28 @@
 require 'hashie'
+require 'fetchable/util'
 
 module Fetchable
+
   class Resource < ActiveRecord::Base
 
+    FILE_STORE = 0
+
     belongs_to :fetchable, polymorphic: true
+
+    def self.settings
+      @@settings ||= Hashie::Mash.new(
+        content_folder: "#{Rails.root}/public/resources",
+        content_prefix: "res"
+      )
+    end
+
+    def settings
+      self.class.settings
+    end
+
+    def path
+      "#{settings.content_folder}/#{settings.content_prefix}#{Fetchable::Util.encode(fetchable.id)}.txt"
+    end
 
     def self.extract_headers(response)
       Hashie::Mash.new(response.to_hash.each_with_object({}) { |(header_type, header_value), nice_headers|
@@ -42,6 +61,7 @@ module Fetchable
       else
         self.assign_from_rest_response(resp, options, redirect_chain)
         self.save!
+        self.save_content(resp, options)
       end
 
     end
@@ -76,5 +96,11 @@ module Fetchable
 
     end
 
+    def save_content(resp, options)
+      FileUtils.mkdir_p(settings.content_folder) unless File.directory?(settings.content_folder)
+      File.open(self.path, 'w') {|f| f.write(resp.body) }
+    end
+
   end
+
 end
