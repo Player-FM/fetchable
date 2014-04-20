@@ -17,4 +17,13 @@ end
 
 class ActiveSupport::TestCase
   fixtures :all
+
+  def dog
+    images(:dog)
+  end
+
+  def now
+    DateTime.new(2000, 1, 1)
+  end
+
 end
