@@ -3,8 +3,8 @@ class CreateResources < ActiveRecord::Migration
     create_table :resources do |t|
 
       # association
-      t.string :fetchable_type
-      t.integer :fetchable_id
+      t.string :fetchery_type
+      t.integer :fetchery_id
 
       # source
       t.string :url

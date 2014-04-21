@@ -1,6 +1,6 @@
 class Document < ActiveRecord::Base
 
-  include Fetchable
+  include Fetchery
   
   before_fetch :handle_before_fetch
   after_fetch :handle_after_fetch

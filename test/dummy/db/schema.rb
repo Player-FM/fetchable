@@ -22,8 +22,8 @@ ActiveRecord::Schema.define(version: 2) do
   end
 
   create_table "resources", force: true do |t|
-    t.string   "fetchable_type"
-    t.integer  "fetchable_id"
+    t.string   "fetchery_type"
+    t.integer  "fetchery_id"
     t.string   "url"
     t.integer  "status_code"
     t.datetime "last_modified"

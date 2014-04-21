@@ -4,7 +4,7 @@ require 'rails/all'
 
 Bundler.require(*Rails.groups)
 require "addressable/uri"
-require "fetchable"
+require "fetchery"
 
 module Dummy
   class Application < Rails::Application

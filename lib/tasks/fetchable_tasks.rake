@@ -1,4 +1,4 @@
 # desc "Explaining what the task does"
-# task :fetchable do
+# task :fetchery do
 #   # Task goes here
 # end

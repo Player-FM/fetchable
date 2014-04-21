@@ -1,14 +1,14 @@
 require 'hashie'
 
-module Fetchable
+module Fetchery
 
   class Resource < ActiveRecord::Base
 
-    belongs_to :fetchable, polymorphic: true
+    belongs_to :fetchery, polymorphic: true
 
     def self.settings
       @@settings ||= Hashie::Mash.new(
-        store: Fetchable::Store::FileStore.new
+        store: Fetchery::Store::FileStore.new
       )
     end
 
@@ -17,7 +17,7 @@ module Fetchable
     end
 
     def path
-      "#{settings.content_folder}/#{settings.content_prefix}#{Fetchable::Util.encode(fetchable.id)}.txt"
+      "#{settings.content_folder}/#{settings.content_prefix}#{Fetchery::Util.encode(fetchery.id)}.txt"
     end
 
     def self.extract_headers(response)
@@ -27,10 +27,10 @@ module Fetchable
     end
 
     def fetch(options={})
-      fetchable.call_callbacks :before_fetch
+      fetchery.call_callbacks :before_fetch
       options = Hashie::Mash.new(options.reverse_merge(limit: 5))
-      deep_fetch(fetchable.url, [], options)
-      fetchable.call_callbacks :after_fetch
+      deep_fetch(fetchery.url, [], options)
+      fetchery.call_callbacks :after_fetch
     end
 
     # http://shadow-file.blogspot.co.uk/2009/03/handling-http-redirection-in-ruby.html

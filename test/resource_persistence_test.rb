@@ -7,15 +7,14 @@ class ResourcePersistenceTest < ActiveSupport::TestCase
   GREETING_SIZE = 5
   GREETING_FINGERPRINT = 'Wab4pWDcin+Z9HBXC8wQD1DkFZIvv3GievNMVjDPIzo='
 
-  def test_first_fetch_creates_resource
-    assert_nil greeting.resource
-    greeting.fetch
-    assert_not_nil greeting.resource
-    assert greeting.resource.fetchable==greeting
-  end
+  DOG_ETAG = '"cee1cac995540c33e06d792e077297bd31e7e504"'
+  DOG_LAST_MODIFIED = 1391848200
+  DOG_SIZE = 20997
+  DOG_SIGNATURE = 'siNHt2UDgfCAwhga/x8nQm3HKXKSrVrLk1U+GtyvYrA='
 
   def test_resource_attribs
     Timecop.freeze(now) do
+      #greeting = Fetchery::Resource.create(url: Dummy::test_file(name: 'greeting.png'))
       greeting.fetch
       assert_equal 200, greeting.resource.status_code
       assert_equal GREETING_ETAG, greeting.resource.etag

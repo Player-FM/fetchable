@@ -1,4 +1,4 @@
-module Fetchable
+module Fetchery
 
   class Util
 
