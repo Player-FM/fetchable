@@ -5,7 +5,7 @@ class StoreTest < ActiveSupport::TestCase
   GREETING_CONTENT = 'ohai'
 
   def test_first_fetch_creates_resource
-    Fetchable::Resource.settings.store = Fetchable::Store::FileStore.new(
+    Document.settings.store = Fetchable::Store::FileStore.new(
       folder: '/tmp/testing',
       name_prefix: 'doco' 
     )

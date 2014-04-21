@@ -49,10 +49,10 @@ module Fetchable
   end
   
   def fetch(options={})
-    #fetchery.call_callbacks :before_fetch
+    self.call_callbacks :before_fetch
     options = Hashie::Mash.new(options.reverse_merge(limit: 5))
     deep_fetch(self.url, [], options)
-    #fetchery.call_callbacks :after_fetch
+    self.call_callbacks :after_fetch
   end
 
   # http://shadow-file.blogspot.co.uk/2009/03/handling-http-redirection-in-ruby.html
