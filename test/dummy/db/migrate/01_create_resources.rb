@@ -2,10 +2,6 @@ class CreateResources < ActiveRecord::Migration
   def change
     create_table :resources do |t|
 
-      # association
-      t.string :fetchery_type
-      t.integer :fetchery_id
-
       # source
       t.string :url
 

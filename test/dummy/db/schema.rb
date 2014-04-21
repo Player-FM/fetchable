@@ -14,16 +14,12 @@
 ActiveRecord::Schema.define(version: 2) do
 
   create_table "documents", force: true do |t|
-    t.integer  "resource_id"
-    t.string   "url"
     t.integer  "word_count"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "resources", force: true do |t|
-    t.string   "fetchery_type"
-    t.integer  "fetchery_id"
     t.string   "url"
     t.integer  "status_code"
     t.datetime "last_modified"

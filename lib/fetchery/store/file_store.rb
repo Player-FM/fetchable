@@ -13,12 +13,12 @@ module Fetchery
       end
 
       def path(resource)
-        "#{@folder}/#{@name_prefix}#{Fetchery::Util.encode(resource.fetchery.id)}.txt"
+        "#{@folder}/#{@name_prefix}#{Fetchery::Util.encode(resource.id)}.txt"
       end
 
       def save_content(resource, response, options)
         FileUtils.mkdir_p(@folder) unless File.directory?(@folder)
-        File.open(self.path(resource), 'w') {|f| f.write(response.body) }
+        File.open(self.path(resource), 'wb') {|f| f.write(response.body) }
       end
 
     end

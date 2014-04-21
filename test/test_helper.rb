@@ -17,10 +17,13 @@ if ActiveSupport::TestCase.method_defined?(:fixture_path=)
 end
 
 class ActiveSupport::TestCase
+
+  set_fixture_class resources: Fetchery::Resource
   fixtures :all
 
   def greeting
-    documents(:greeting)
+    #documents(:greeting)
+    resources(:greeting)
   end
 
   def now
