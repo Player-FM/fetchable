@@ -1,4 +1,6 @@
 require 'fetchable/resource'
+require 'fetchable/util'
+require 'fetchable/store/file_store'
 require 'net/http'
 require 'excon'
 require 'byebug'

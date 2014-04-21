@@ -1,18 +1,14 @@
 require 'hashie'
-require 'fetchable/util'
 
 module Fetchable
 
   class Resource < ActiveRecord::Base
 
-    FILE_STORE = 0
-
     belongs_to :fetchable, polymorphic: true
 
     def self.settings
       @@settings ||= Hashie::Mash.new(
-        content_folder: "#{Rails.root}/public/resources",
-        content_prefix: "res"
+        store: Fetchable::Store::FileStore.new
       )
     end
 
@@ -61,7 +57,7 @@ module Fetchable
       else
         self.assign_from_rest_response(resp, options, redirect_chain)
         self.save!
-        self.save_content(resp, options)
+        settings[:store].save_content(self, resp, options) if settings[:store]
       end
 
     end
@@ -94,11 +90,6 @@ module Fetchable
 
       self.tried_at = now
 
-    end
-
-    def save_content(resp, options)
-      FileUtils.mkdir_p(settings.content_folder) unless File.directory?(settings.content_folder)
-      File.open(self.path, 'w') {|f| f.write(resp.body) }
     end
 
   end
