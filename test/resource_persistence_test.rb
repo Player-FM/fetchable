@@ -19,7 +19,7 @@ class ResourcePersistenceTest < ActiveSupport::TestCase
 
   def test_resource_attribs
     Timecop.freeze(now) do
-      farewell = Fetchery::Resource.create(url: Dummy::test_file(name: 'farewell.txt'))
+      farewell = Fetchable::Resource.create(url: Dummy::test_file(name: 'farewell.txt'))
       farewell.fetch
       assert_equal 200, farewell.status_code
       assert_equal FAREWELL_ETAG, farewell.etag

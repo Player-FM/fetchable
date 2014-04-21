@@ -1,16 +1,16 @@
-require 'fetchery/resource'
-require 'fetchery/util'
-require 'fetchery/store/file_store'
+require 'fetchable/resource'
+require 'fetchable/util'
+require 'fetchable/store/file_store'
 require 'net/http'
 require 'excon'
 require 'byebug'
 
-module Fetchery
+module Fetchable
 
   extend ActiveSupport::Concern
 
   included do
-    has_one :resource, class_name: 'Fetchery::Resource', foreign_key: 'fetchery_id', as: :fetchery
+    has_one :resource, class_name: 'Fetchable::Resource', foreign_key: 'fetchable_id', as: :fetchable
   end
 
   module ClassMethods
@@ -35,8 +35,8 @@ module Fetchery
   end
 
   def fetch(options={})
-    self.resource ||= Fetchery::Resource.create(fetchery_id: self.id)
-    self.resource.fetchery = self # in case self changed recently
+    self.resource ||= Fetchable::Resource.create(fetchable_id: self.id)
+    self.resource.fetchable = self # in case self changed recently
     self.resource.fetch(options)
   end
 

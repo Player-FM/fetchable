@@ -1,4 +1,4 @@
-class Document < Fetchery::Resource
+class Document < Fetchable::Resource
 
   before_fetch :handle_before_fetch
   after_fetch :handle_after_fetch

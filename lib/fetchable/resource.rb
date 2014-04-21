@@ -1,12 +1,12 @@
 require 'hashie'
 
-module Fetchery
+module Fetchable
 
   class Resource < ActiveRecord::Base
 
     def self.settings
       @@settings ||= Hashie::Mash.new(
-        store: Fetchery::Store::FileStore.new
+        store: Fetchable::Store::FileStore.new
       )
     end
 
@@ -15,7 +15,7 @@ module Fetchery
     end
 
     def path
-      "#{settings.content_folder}/#{settings.content_prefix}#{Fetchery::Util.encode(self.id)}.txt"
+      "#{settings.content_folder}/#{settings.content_prefix}#{Fetchable::Util.encode(self.id)}.txt"
     end
 
     def self.extract_headers(response)

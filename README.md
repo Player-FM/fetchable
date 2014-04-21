@@ -1,4 +1,4 @@
-### Fetchery
+### Fetchable
 
 This Rails plugin helps you sync ActiveRecords with remote resources. It's
 convenient for writing bots, scrapers, and the like.
@@ -11,10 +11,10 @@ Notes:
 
 ### Basic usage
 
-Fetchery retains call results for you.
+Fetchable retains call results for you.
 
     class Image < ActiveRecord::Base
-      include Fetchery
+      include Fetchable
     end
 
     image = image.create(url: 'http://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png')
@@ -24,7 +24,7 @@ Fetchery retains call results for you.
 
 ### Re-fetch example
 
-Fetchery conserves energy. HTTP "memento" standards (eTags and timestamp) are
+Fetchable conserves energy. HTTP "memento" standards (eTags and timestamp) are
 leveraged to avoid unnecessarily repeating stuff.
 
     image.fetch # first fetch creates a resource record
@@ -32,12 +32,12 @@ leveraged to avoid unnecessarily repeating stuff.
 
 ### Callback example
 
-Fetchery calls your ActiveRecord when stuff happens, just like the usual
+Fetchable calls your ActiveRecord when stuff happens, just like the usual
 ActiveRecord callbacks.
 
     class Image < ActiveRecord::Base
 
-      include Fetchery
+      include Fetchable
 
       before_fetch :cancel_if_server_too_busy
       after_new_fetch :save_image_dimensions
@@ -49,7 +49,7 @@ ActiveRecord callbacks.
 
 ### Fetch management
 
-Fetchery helps you schedule recurring fetches.
+Fetchable helps you schedule recurring fetches.
 
     class Image
       refetching({
@@ -68,21 +68,21 @@ Track permanent redirects in another table
 
 Possible options in the future:
 * Retain resource body, either on file system or in DB
-* Touch fetchery iff resource changes
+* Touch fetchable iff resource changes
 * Change conventions ("url" name and callbacks)
 * Enforce unique URLs (and maybe canonical URLs)
 
 ### Setup
 
 Create a "resources" table. For now, [see this
-example](https://github.com/playerfm/fetchery/blob/master/test/dummy/db/migrate/01_create_resources.rb).
+example](https://github.com/playerfm/fetchable/blob/master/test/dummy/db/migrate/01_create_resources.rb).
 
-For each of your fetchery classes, add a add an integer `resource_id` int
+For each of your fetchable classes, add a add an integer `resource_id` int
 column and a string 'url' column.
 
 ### Contributing
 
-Contributions are welcome. Please include tests and ensure it passes [Travis](https://travis-ci.org/playerfm/fetchery).
+Contributions are welcome. Please include tests and ensure it passes [Travis](https://travis-ci.org/playerfm/fetchable).
 
 It's much faster to run tests locally by running the
 [testdata](https://github.com/playerfm/testdata) server locally, but it works

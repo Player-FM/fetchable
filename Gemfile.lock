@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fetchery (0.0.1)
+    fetchable (0.0.1)
       excon
       hashie
       rails (~> 4.1.0)
@@ -106,7 +106,7 @@ PLATFORMS
 DEPENDENCIES
   addressable
   byebug
-  fetchery!
+  fetchable!
   mocha
   rake
   single_test

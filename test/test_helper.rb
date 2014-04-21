@@ -18,7 +18,7 @@ end
 
 class ActiveSupport::TestCase
 
-  set_fixture_class resources: Fetchery::Resource
+  set_fixture_class resources: Fetchable::Resource
   fixtures :all
 
   def greeting

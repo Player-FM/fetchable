@@ -1,4 +1,4 @@
-module Fetchery
+module Fetchable
 
   module Store
 
@@ -13,7 +13,7 @@ module Fetchery
       end
 
       def path(resource)
-        "#{@folder}/#{@name_prefix}#{Fetchery::Util.encode(resource.id)}.txt"
+        "#{@folder}/#{@name_prefix}#{Fetchable::Util.encode(resource.id)}.txt"
       end
 
       def save_content(resource, response, options)
