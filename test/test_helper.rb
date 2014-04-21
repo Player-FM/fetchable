@@ -18,12 +18,12 @@ end
 
 class ActiveSupport::TestCase
 
-  set_fixture_class resources: Fetchable::Resource
+  #set_fixture_class resources: Fetchable::Resource
   fixtures :all
 
   def greeting
     #documents(:greeting)
-    resources(:greeting)
+    documents(:greeting)
   end
 
   def now
