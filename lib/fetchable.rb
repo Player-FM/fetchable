@@ -25,11 +25,15 @@ module Fetchable
       # add
     end
 
-    %w(before_fetch after_fetch).each { |event|
+    %w(before_fetch after_fetch after_refetch after_fetch_redirect after_fetch_error).each { |event|
       self.callbacks[event]=[]
       define_method(event.to_sym) { |handler| self.callbacks[event] << handler }
     }
 
+  end
+
+  included do
+    serialize :redirect_chain
   end
 
   def fetch(options={})
@@ -49,8 +53,8 @@ module Fetchable
   def fetch(options={})
     self.call_callbacks :before_fetch
     options = Hashie::Mash.new(options.reverse_merge(limit: 5))
-    deep_fetch(self.url, [], options)
-    self.call_callbacks :after_fetch
+    response = deep_fetch(self.url, [], options)
+    call_callbacks_based_on_response(response)
   end
 
   # http://shadow-file.blogspot.co.uk/2009/03/handling-http-redirection-in-ruby.html
@@ -72,7 +76,7 @@ module Fetchable
       end
       # Use URI.parse() instead of raw URL because raw URL string includes
       # unnecessary :80 and :443 port number
-      redirect_chain << URI.parse(new_url).to_s
+      redirect_chain << { url: URI.parse(new_url).to_s, status_code: resp.status }
       deep_fetch new_url, redirect_chain, options
     else
       self.assign_from_rest_response(resp, options, redirect_chain)
@@ -80,6 +84,8 @@ module Fetchable
       store = self.class.settings[:store]
       store.save_content(self, resp, options) if store
     end
+
+    resp
 
   end
 
@@ -94,7 +100,12 @@ module Fetchable
     self.last_modified = DateTime.parse(headers['Last-Modified']) if headers['Last-Modified']
     self.size = (response.body.length if response.body)
     self.fingerprint = (Base64.strict_encode64(Digest::SHA256.new.digest(response.body)) if response.body)
-    self.redirected_to = redirect_chain.last
+    if redirect_chain.present?
+      self.redirect_chain = redirect_chain 
+      self.permanent_redirect_url = calculate_permanent_redirect_url
+    else
+      self.redirect_chain = self.permanent_redirect_url = nil
+    end
 
     now = DateTime.now
     if [200,304].include?(response.status)
@@ -111,6 +122,28 @@ module Fetchable
 
     self.tried_at = now
 
+  end
+
+  def call_callbacks_based_on_response(response)
+    self.call_callbacks(:after_fetch_error) if self.status_code >= 400
+    self.call_callbacks(:after_refetch) if self.status_code==304
+    self.call_callbacks(:after_fetch_redirect) if [301,302].include?(self.status_code)
+    self.call_callbacks(:after_fetch)
+  end
+
+  def redirected_to
+    self.redirect_chain.last[:url] if self.redirect_chain
+  end
+
+  def calculate_permanent_redirect_url
+    the_url = nil
+    if self.redirect_chain
+      self.redirect_chain.each { |redirect|
+        break if redirect[:status_code]==302
+        the_url = redirect[:url]
+      }
+    end
+    the_url
   end
 
 end

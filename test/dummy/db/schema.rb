@@ -20,8 +20,9 @@ ActiveRecord::Schema.define(version: 1) do
     t.integer  "size"
     t.string   "etag"
     t.string   "fingerprint"
-    t.string   "redirected_to"
-    t.integer  "fail_count",     default: 0
+    t.string   "redirect_chain"
+    t.string   "permanent_redirect_url"
+    t.integer  "fail_count",             default: 0
     t.datetime "next_try_after"
     t.datetime "fetched_at"
     t.datetime "refetched_at"

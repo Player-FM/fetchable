@@ -16,7 +16,8 @@ module Fetchable
         column(:size, :integer)
         column(:etag, :string)
         column(:fingerprint, :string)
-        column(:redirected_to, :string)
+        column(:redirect_chain, :string)
+        column(:permanent_redirect_url, :string)
 
         # tracking over time
         column(:fail_count, :integer, default: 0, nil: false)
