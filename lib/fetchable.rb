@@ -3,6 +3,7 @@ require 'net/http'
 require 'excon'
 require 'byebug'
 require 'fetchable/util'
+require 'fetchable/fetcher'
 require 'fetchable/migration'
 require 'fetchable/stores/file_store'
 require 'fetchable/schedulers/simple_scheduler'
@@ -41,48 +42,16 @@ module Fetchable
   def store_key
     self.class.settings[:store].key_of(self)
   end
-  
+
   def fetch(options={})
     self.call_callbacks :before_fetch
     options = Hashie::Mash.new(options.reverse_merge(limit: 5))
-    response = deep_fetch(self.url, [], options)
-    call_callbacks_based_on_response(response)
+    response, options, redirect_chain = Fetchable::Fetcher.deep_fetch(self, self.url, [], options)
+    self.assign_from_rest_response(response, options, redirect_chain)
+    self.save!
+    self.call_callbacks_based_on_response(response)
   end
-
-  # http://shadow-file.blogspot.co.uk/2009/03/handling-http-redirection-in-ruby.html
-  def deep_fetch(url, redirect_chain, options)
-
-    # Set up call
-    headers = Hashie::Mash.new
-    headers['if-none-match'] = self.etag if self.etag.present?
-    headers['if-modified-since'] = self.last_modified.rfc2822 if self.last_modified.present?
-
-    resp = Excon.get(url, headers: headers)
-
-    if [301,302].include?(resp.status) and redirect_chain.size <= options.limit
-      new_url = resp.headers['location']
-      if URI.parse(new_url).relative?
-        old_url = Addressable::URI.parse(url)
-        port = '' if [old_url.port, old_url.scheme] == [80, 'http'] || [old_url.port, old_url.scheme] == [443, 'https']
-        new_url = "#{old_url.scheme}://#{old_url.host}:#{port}#{resp.headers['location']}"
-      end
-      # Use URI.parse() instead of raw URL because raw URL string includes
-      # unnecessary :80 and :443 port number
-      redirect_chain << { url: URI.parse(new_url).to_s, status_code: resp.status }
-      deep_fetch new_url, redirect_chain, options
-    else
-      self.assign_from_rest_response(resp, options, redirect_chain)
-      self.save!
-      if resp.status!=304
-        store = self.class.settings[:store]
-        store.save_content(self, resp, options) if store
-      end
-    end
-
-    resp
-
-  end
-
+  
   def assign_from_rest_response(response, options, redirect_chain)
 
     #self.status_code = response.code
@@ -122,6 +91,10 @@ module Fetchable
     self.tried_at = now
     if scheduler = self.class.settings.scheduler
       self.next_fetch_after = now + scheduler.next_fetch_wait(self)
+    end
+
+    if response.status!=304 and store = self.class.settings[:store]
+      store.save_content(self, response, options)
     end
 
   end
