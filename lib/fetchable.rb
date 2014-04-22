@@ -3,6 +3,7 @@ require 'net/http'
 require 'excon'
 require 'byebug'
 require 'fetchable/util'
+require 'fetchable/migration'
 require 'fetchable/store/file_store'
 
 module Fetchable

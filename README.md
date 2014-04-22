@@ -62,14 +62,17 @@ Fetchable helps you schedule recurring fetches.
 
     Image.due_for_repeat_fetch.each { |i| i.fetch(hard: true) }
 
+### Other Features (not doc'd yet)
+
+* Retain resource body, either on file system or in DB
+
 ### Future plans
 
 Track permanent redirects in another table
 
 Possible options in the future:
-* Retain resource body, either on file system or in DB
-* Touch fetchable iff resource changes
-* Change conventions ("url" name and callbacks)
+* Migration support
+* changed\_at: Recognise same content transmission via fingerprint (pseudo-304)
 * Enforce unique URLs (and maybe canonical URLs)
 
 ### Setup
