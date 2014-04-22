@@ -4,7 +4,8 @@ require 'excon'
 require 'byebug'
 require 'fetchable/util'
 require 'fetchable/migration'
-require 'fetchable/store/file_store'
+require 'fetchable/stores/file_store'
+require 'fetchable/schedulers/simple_scheduler'
 
 module Fetchable
 
@@ -29,18 +30,16 @@ module Fetchable
     attr_reader :body
   end
 
-  def fetch(options={})
-    self.resource ||= Fetchable::Resource.create(fetchable_id: self.id)
-    self.resource.fetchable = self # in case self changed recently
-    self.resource.fetch(options)
-  end
+  # Convenient shorthands
+  def ok? ; self.fail_count==0 ; end
+  def failed? ; self.fail_count > 0 ; end
 
   def call_callbacks(event)
     self.class.callbacks[event].each { |c| self.send(c) }
   end
 
-  def path
-    "#{settings.content_folder}/#{settings.content_prefix}#{Fetchable::Util.encode(self.id)}.txt"
+  def store_key
+    self.class.settings[:store].key_of(self)
   end
   
   def fetch(options={})
@@ -114,15 +113,16 @@ module Fetchable
       self.fail_count = 0
       self.fetched_at = now
       self.refetched_at = now if response.status==304
-      self.next_try_after = now+1.day
     else
       self.fail_count ||= 0
       self.fail_count += 1
       self.failed_at = now
-      self.next_try_after = now+1.hour
     end
 
     self.tried_at = now
+    if scheduler = self.class.settings.scheduler
+      self.next_fetch_after = now + scheduler.next_fetch_wait(self)
+    end
 
   end
 

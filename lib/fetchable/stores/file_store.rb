@@ -1,6 +1,6 @@
 module Fetchable
 
-  module Store
+  module Stores
 
     class FileStore
 
@@ -17,14 +17,14 @@ module Fetchable
         @folder || "#{Rails.root}/public/resources"
       end
 
-      def path(resource)
+      def key_of(resource)
         "#{get_folder}/#{@name_prefix}#{Fetchable::Util.encode(resource.id)}.txt"
       end
 
       def save_content(resource, response, options)
         folder = get_folder
         FileUtils.mkdir_p(folder) unless File.directory?(folder)
-        File.open(self.path(resource), 'wb') {|f| f.write(response.body) }
+        File.open(self.key_of(resource), 'wb') {|f| f.write(response.body) }
       end
 
     end

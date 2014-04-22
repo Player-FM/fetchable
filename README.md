@@ -17,10 +17,17 @@ Fetchable retains call results for you.
       include Fetchable
     end
 
-    image = image.create(url: 'http://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png')
+    image = Image.create(url: 'http://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png')
     image.fetch
     puts image.resource.size # 12345
     puts image.live_resource? # true
+
+### Storage
+
+Fetchable optionally stores the retrieved payload via pluggable storage modules.
+
+    image.fetch
+    MyImageTool.brighten!(file_path: image.store_key)
 
 ### Re-fetch support
 
@@ -32,16 +39,9 @@ leveraged to avoid unnecessarily repeating stuff.
     image.fetch # second re-fetch only does a full download if the image changed
     puts image.status # 304
 
-### Storage
-
-Fetchable optionally stores the retrieved payload.
-
-    image.fetch
-    image_tools.brighten!('images/dog.jpg')
-
 ### Callbacks
 
-Fetchable calls your ActiveRecord when stuff happens, just like the usual
+Fetchable lets you register for interesting events, just like the usual
 ActiveRecord callbacks.
 
     class Image < ActiveRecord::Base

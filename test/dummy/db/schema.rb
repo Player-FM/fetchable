@@ -23,7 +23,7 @@ ActiveRecord::Schema.define(version: 1) do
     t.string   "redirect_chain"
     t.string   "permanent_redirect_url"
     t.integer  "fail_count",             default: 0
-    t.datetime "next_try_after"
+    t.datetime "next_fetch_after"
     t.datetime "fetched_at"
     t.datetime "refetched_at"
     t.datetime "failed_at"

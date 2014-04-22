@@ -31,7 +31,6 @@ class FetchableTest < ActiveSupport::TestCase
       assert_equal 0, farewell.fail_count
       assert_equal now, farewell.tried_at
       assert_equal now, farewell.fetched_at
-      assert_equal now+1.day, farewell.next_try_after
     end
   end
 
@@ -51,7 +50,6 @@ class FetchableTest < ActiveSupport::TestCase
       assert_equal 1, greeting.fail_count
       assert_equal now, greeting.tried_at
       assert_equal now, greeting.failed_at
-      assert_equal now+1.hour, greeting.next_try_after
       greeting.fetch
       assert_equal 2, greeting.fail_count
     end

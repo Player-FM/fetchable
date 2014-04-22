@@ -21,7 +21,7 @@ module Fetchable
 
         # tracking over time
         column(:fail_count, :integer, default: 0, nil: false)
-        column(:next_try_after, :datetime)
+        column(:next_fetch_after, :datetime)
         column(:fetched_at, :datetime)
         column(:refetched_at, :datetime)
         column(:failed_at, :datetime)
