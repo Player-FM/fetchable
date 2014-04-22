@@ -9,6 +9,19 @@ class EventTest < ActiveSupport::TestCase
     greeting.fetch
   end
 
+  def test_updated_fetch_event
+
+    greeting.fetch
+
+    greeting.expects(:handle_fetch_update).never
+    greeting.fetch
+
+    greeting.url = Dummy::test_file(name: 'farewell.txt', last_modified: '_')
+    greeting.expects(:handle_fetch_update)
+    greeting.fetch
+
+  end
+
   def test_refetch_event_after_304
     greeting.fetch
     greeting.expects(:handle_before_fetch)

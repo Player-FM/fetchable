@@ -5,6 +5,7 @@ class Document < ActiveRecord::Base
   before_fetch :handle_before_fetch
   after_fetch :handle_after_fetch
   after_refetch :handle_refetch
+  after_fetch_update :handle_fetch_update
   after_fetch_redirect :handle_fetch_redirect
   after_fetch_error :handle_fetch_error
 
@@ -12,6 +13,7 @@ class Document < ActiveRecord::Base
   def handle_before_fetch ; end
   def handle_after_fetch ; end
   def handle_refetch ; end
+  def handle_fetch_update ; end
   def handle_fetch_error ; end
   def handle_fetch_redirect ; end
 

@@ -22,15 +22,24 @@ Fetchable retains call results for you.
     puts image.resource.size # 12345
     puts image.live_resource? # true
 
-### Re-fetch example
+### Re-fetch support
 
 Fetchable conserves energy. HTTP "memento" standards (eTags and timestamp) are
 leveraged to avoid unnecessarily repeating stuff.
 
     image.fetch # first fetch creates a resource record
+    puts image.status # 200
     image.fetch # second re-fetch only does a full download if the image changed
+    puts image.status # 304
 
-### Callback example
+### Storage
+
+Fetchable optionally stores the retrieved payload.
+
+    image.fetch
+    image_tools.brighten!('images/dog.jpg')
+
+### Callbacks
 
 Fetchable calls your ActiveRecord when stuff happens, just like the usual
 ActiveRecord callbacks.
@@ -40,9 +49,9 @@ ActiveRecord callbacks.
       include Fetchable
 
       before_fetch :cancel_if_server_too_busy
-      after_new_fetch :save_image_dimensions
-      fetch_error :report_problem
-      after_redirect :save_url_alias
+      after_fetch_update :save_image_dimensions
+      after_fetch_error :report_problem
+      after_fetch_redirect :save_url_alias
       after_fetch :log_fetch
 
     end

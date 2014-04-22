@@ -14,18 +14,10 @@ module Fetchable
 
     cattr_accessor :callbacks, :settings
 
-    self.settings = Hashie::Mash.new(
-      store: Fetchable::Store::FileStore.new
-    )
-
+    self.settings = Hashie::Mash.new
     self.callbacks=Hashie::Mash.new
 
-    def add_callback(event, handler)
-      # ensure
-      # add
-    end
-
-    %w(before_fetch after_fetch after_refetch after_fetch_redirect after_fetch_error).each { |event|
+    %w(before_fetch after_fetch after_fetch_update after_refetch after_fetch_redirect after_fetch_error).each { |event|
       self.callbacks[event]=[]
       define_method(event.to_sym) { |handler| self.callbacks[event] << handler }
     }
@@ -81,8 +73,10 @@ module Fetchable
     else
       self.assign_from_rest_response(resp, options, redirect_chain)
       self.save!
-      store = self.class.settings[:store]
-      store.save_content(self, resp, options) if store
+      if resp.status!=304
+        store = self.class.settings[:store]
+        store.save_content(self, resp, options) if store
+      end
     end
 
     resp
@@ -98,8 +92,14 @@ module Fetchable
     headers = Hashie::Mash.new(response.headers)
     self.etag = headers.Etag if headers.Etag
     self.last_modified = DateTime.parse(headers['Last-Modified']) if headers['Last-Modified']
-    self.size = (response.body.length if response.body)
-    self.fingerprint = (Base64.strict_encode64(Digest::SHA256.new.digest(response.body)) if response.body)
+    @previous_fingerprint = self.fingerprint
+    if response.body.present?
+      self.fingerprint = Base64.strict_encode64(Digest::SHA256.new.digest(response.body))
+      self.size = response.body.length
+    elsif response.status!=304
+      self.fingerprint = nil
+      self.size = nil
+    end
     if redirect_chain.present?
       self.redirect_chain = redirect_chain 
       self.permanent_redirect_url = calculate_permanent_redirect_url
@@ -127,6 +127,7 @@ module Fetchable
   def call_callbacks_based_on_response(response)
     self.call_callbacks(:after_fetch_error) if self.status_code >= 400
     self.call_callbacks(:after_refetch) if self.status_code==304
+    self.call_callbacks(:after_fetch_update) if self.fingerprint!=@previous_fingerprint
     self.call_callbacks(:after_fetch_redirect) if self.redirect_chain.present?
     self.call_callbacks(:after_fetch)
   end
