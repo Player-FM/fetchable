@@ -127,7 +127,7 @@ module Fetchable
   def call_callbacks_based_on_response(response)
     self.call_callbacks(:after_fetch_error) if self.status_code >= 400
     self.call_callbacks(:after_refetch) if self.status_code==304
-    self.call_callbacks(:after_fetch_redirect) if [301,302].include?(self.status_code)
+    self.call_callbacks(:after_fetch_redirect) if self.redirect_chain.present?
     self.call_callbacks(:after_fetch)
   end
 

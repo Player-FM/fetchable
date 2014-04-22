@@ -9,7 +9,7 @@ class EventTest < ActiveSupport::TestCase
     greeting.fetch
   end
 
-  def test_refetch_after_304
+  def test_refetch_event_after_304
     greeting.fetch
     greeting.expects(:handle_before_fetch)
     greeting.expects(:handle_after_fetch)
@@ -17,7 +17,7 @@ class EventTest < ActiveSupport::TestCase
     greeting.fetch
   end
 
-  def test_error_after_404
+  def test_error_event_after_404
     greeting.expects(:handle_before_fetch)
     greeting.expects(:handle_fetch_error)
     greeting.expects(:handle_after_fetch)
@@ -25,7 +25,7 @@ class EventTest < ActiveSupport::TestCase
     greeting.fetch
   end
 
-  def test_error_after_404
+  def test_refetch_event_after_302
     greeting.expects(:handle_before_fetch)
     greeting.expects(:handle_fetch_redirect)
     greeting.expects(:handle_after_fetch)
