@@ -17,21 +17,18 @@ module Fetchable
       store: Fetchable::Store::FileStore.new
     )
 
+    self.callbacks=Hashie::Mash.new
+
     def add_callback(event, handler)
       # ensure
-      self.callbacks||=Hashie::Mash.new
-      self.callbacks[event]||=[]
       # add
-      self.callbacks[event] << handler
     end
 
-    %w(before_fetch after_fetch).each { |callback|
-      define_method(callback.to_sym) { |handler| add_callback(callback.to_sym, handler) }
+    %w(before_fetch after_fetch).each { |event|
+      self.callbacks[event]=[]
+      define_method(event.to_sym) { |handler| self.callbacks[event] << handler }
     }
 
-  end
-
-  module InstanceMethods
   end
 
   def fetch(options={})
