@@ -26,6 +26,7 @@ module Fetchable
 
   included do
     serialize :redirect_chain
+    attr_reader :body
   end
 
   def fetch(options={})
@@ -96,6 +97,7 @@ module Fetchable
     if response.body.present?
       self.fingerprint = Base64.strict_encode64(Digest::SHA256.new.digest(response.body))
       self.size = response.body.length
+      @body = response.body.chomp
     elsif response.status!=304
       self.fingerprint = nil
       self.size = nil

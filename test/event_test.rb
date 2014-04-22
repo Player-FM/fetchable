@@ -9,6 +9,11 @@ class EventTest < ActiveSupport::TestCase
     greeting.fetch
   end
 
+  def test_body_access
+    greeting.fetch
+    assert_equal 'ohai', greeting.body
+  end
+
   def test_updated_fetch_event
 
     greeting.fetch

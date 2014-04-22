@@ -56,7 +56,7 @@ ActiveRecord callbacks.
 
     end
 
-### Fetch management
+### Manage fetching
 
 Fetchable helps you schedule recurring fetches.
 
