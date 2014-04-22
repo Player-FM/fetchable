@@ -31,28 +31,38 @@ module Fetchable
     attr_reader :body
   end
 
-  # Convenient shorthands
-  def ok? ; self.fail_count==0 ; end
-  def failed? ; self.fail_count > 0 ; end
-
   def call_callbacks(event)
     self.class.callbacks[event].each { |c| self.send(c) }
   end
 
-  def store_key
-    self.class.settings[:store].key_of(self)
-  end
+  # Convenient shorthands
+  def ok? ; self.fail_count==0 ; end
+  def failed? ; self.fail_count > 0 ; end
+  def redirected_to ; self.redirect_chain.last[:url] if self.redirect_chain ; end
+  def store_key ; self.class.settings[:store].key_of(self) ; end
 
   def fetch(options={})
+
     self.call_callbacks :before_fetch
     options = Hashie::Mash.new(options.reverse_merge(limit: 5))
     response, options, redirect_chain = Fetchable::Fetcher.deep_fetch(self, self.url, [], options)
-    self.assign_from_rest_response(response, options, redirect_chain)
+    now = DateTime.now
+    self.assign_from_rest_response(response, options, redirect_chain, now)
     self.save!
+
+    if scheduler = self.class.settings.scheduler
+      self.next_fetch_after = now + scheduler.next_fetch_wait(self)
+    end
+
+    if response.status!=304 and store = self.class.settings[:store]
+      store.save_content(self, response, options)
+    end
+
     self.call_callbacks_based_on_response(response)
+
   end
   
-  def assign_from_rest_response(response, options, redirect_chain)
+  def assign_from_rest_response(response, options, redirect_chain, now)
 
     #self.status_code = response.code
     #headers = self.class.extract_headers(response)
@@ -77,7 +87,6 @@ module Fetchable
       self.redirect_chain = self.permanent_redirect_url = nil
     end
 
-    now = DateTime.now
     if [200,304].include?(response.status)
       self.fail_count = 0
       self.fetched_at = now
@@ -89,14 +98,6 @@ module Fetchable
     end
 
     self.tried_at = now
-    if scheduler = self.class.settings.scheduler
-      self.next_fetch_after = now + scheduler.next_fetch_wait(self)
-    end
-
-    if response.status!=304 and store = self.class.settings[:store]
-      store.save_content(self, response, options)
-    end
-
   end
 
   def call_callbacks_based_on_response(response)
@@ -105,10 +106,6 @@ module Fetchable
     self.call_callbacks(:after_fetch_update) if self.fingerprint!=@previous_fingerprint
     self.call_callbacks(:after_fetch_redirect) if self.redirect_chain.present?
     self.call_callbacks(:after_fetch)
-  end
-
-  def redirected_to
-    self.redirect_chain.last[:url] if self.redirect_chain
   end
 
   def calculate_permanent_redirect_url
