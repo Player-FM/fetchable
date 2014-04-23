@@ -11,7 +11,7 @@ module Fetchable
       end
 
       def next_fetch_wait(fetchable)
-        fetchable.ok? ? @success_wait : @fail_wait
+        x = fetchable.ok? ? @success_wait : @fail_wait
       end
 
     end

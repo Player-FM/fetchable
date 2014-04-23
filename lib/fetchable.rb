@@ -7,6 +7,7 @@ require 'fetchable/fetcher'
 require 'fetchable/migration'
 require 'fetchable/stores/file_store'
 require 'fetchable/schedulers/simple_scheduler'
+require 'fetchable/schedulers/decaying_scheduler'
 
 module Fetchable
 
@@ -17,7 +18,7 @@ module Fetchable
     cattr_accessor :callbacks, :settings
 
     self.settings = Hashie::Mash.new
-    self.callbacks=Hashie::Mash.new
+    self.callbacks = Hashie::Mash.new
 
     %w(before_fetch after_fetch after_fetch_update after_refetch after_fetch_redirect after_fetch_error).each { |event|
       self.callbacks[event]=[]
@@ -50,6 +51,7 @@ module Fetchable
     self.assign_from_rest_response(response, options, redirect_chain, now)
     self.save!
 
+    #byebug
     if scheduler = self.class.settings.scheduler
       self.next_fetch_after = now + scheduler.next_fetch_wait(self)
     end
@@ -101,7 +103,9 @@ module Fetchable
   end
 
   def call_callbacks_based_on_response(response)
-    self.call_callbacks(:after_fetch_error) if self.status_code >= 400
+    # normally error would be >= 400, but here it's >= 300 because a final redirect
+    # status implies we hit the redirect limit
+    self.call_callbacks(:after_fetch_error) if self.status_code >= 300
     self.call_callbacks(:after_refetch) if self.status_code==304
     self.call_callbacks(:after_fetch_update) if self.fingerprint!=@previous_fingerprint
     self.call_callbacks(:after_fetch_redirect) if self.redirect_chain.present?

@@ -2,20 +2,6 @@ class Document < ActiveRecord::Base
 
   include Fetchable
 
-  settings.scheduler = Fetchable::Schedulers::SimpleScheduler.new(
-    success_wait: 1.hour,
-    fail_wait: 2.days
-  )
-=begin
-  (
-    success_wait: 1.week,
-    recurring_problem_wait: 10.minutes,
-    problem_tries: 3,
-    initial_error_wait: 1.hour,
-    error_decay: 2
-  )
-=end
-
   settings.store = Fetchable::Stores::FileStore.new(
     folder: '/tmp/testing',
     name_prefix: 'doco' 

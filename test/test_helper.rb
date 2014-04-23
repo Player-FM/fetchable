@@ -27,7 +27,7 @@ class ActiveSupport::TestCase
   end
 
   def now
-    DateTime.new(2000, 1, 1)
+    DateTime.new(2000, 1, 1, 0, 0, 0)
   end
 
 end
