@@ -30,6 +30,7 @@ module Fetchable
   included do
     serialize :redirect_chain
     attr_reader :body
+    scope :ready_for_fetch, -> { where('? >= next_fetch_after', DateTime.now).order(:next_fetch_after) }
   end
 
   def call_callbacks(event)
@@ -40,7 +41,10 @@ module Fetchable
   def ok? ; self.fail_count==0 ; end
   def failed? ; self.fail_count > 0 ; end
   def redirected_to ; self.redirect_chain.last[:url] if self.redirect_chain ; end
+
+  # Delegating to strategies
   def store_key ; self.class.settings[:store].key_of(self) ; end
+  #def ready_for_fetch ; self.class.settings[:scheduler].ready_for_fetch(self.class) ; end
 
   def fetch(options={})
 
@@ -49,7 +53,6 @@ module Fetchable
     response, options, redirect_chain = Fetchable::Fetcher.deep_fetch(self, self.url, [], options)
     now = DateTime.now
     self.assign_from_rest_response(response, options, redirect_chain, now)
-    self.save!
 
     #byebug
     if scheduler = self.class.settings.scheduler
@@ -61,6 +64,7 @@ module Fetchable
     end
 
     self.call_callbacks_based_on_response(response)
+    self.save!
 
   end
   

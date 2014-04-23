@@ -73,5 +73,23 @@ class SchedulerTest < ActiveSupport::TestCase
 
   end
 
+  def test_ready_for_fetch_query
+
+    Document.settings.scheduler = Fetchable::Schedulers::SimpleScheduler.new(
+      success_wait: 1.hour,
+      fail_wait: 2.days
+    )
+    
+    Timecop.freeze(now) do
+      greeting.fetch
+      assert_equal [], Document.ready_for_fetch
+    end
+
+    Timecop.freeze(now+2.hours) do
+      assert_equal [greeting], Document.ready_for_fetch
+    end
+     
+  end
+
 
 end
