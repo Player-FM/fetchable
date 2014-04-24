@@ -2,12 +2,8 @@ require 'hashie'
 require 'net/http'
 require 'excon'
 require 'byebug'
-require 'fetchable/util'
-require 'fetchable/fetcher'
-require 'fetchable/migration'
-require 'fetchable/stores/file_store'
-require 'fetchable/schedulers/simple_scheduler'
-require 'fetchable/schedulers/decaying_scheduler'
+project_root = File.dirname(File.absolute_path(__FILE__))
+Dir.glob(project_root + '/fetchable/**/*.rb', &method(:require))
 
 module Fetchable
 

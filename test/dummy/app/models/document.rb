@@ -7,6 +7,11 @@ class Document < ActiveRecord::Base
     name_prefix: 'doco' 
   )
 
+  settings.scheduler = Fetchable::Schedulers::SimpleScheduler.new(
+    success_wait: 1.hour,
+    fail_wait: 2.hours
+  )
+
   before_fetch :handle_before_fetch
   after_fetch :handle_after_fetch
   after_refetch :handle_refetch

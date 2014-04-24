@@ -56,24 +56,21 @@ ActiveRecord callbacks.
 
     end
 
-### Manage fetching
+### Scheduling fetches
 
 Fetchable helps you schedule recurring fetches.
 
     class Image
-      refetching({
-        repeat: 1.day,       # minimum repeat wait after success
-        retry: 1.hour,       # minimum repeat after error (decays exponentially)
-        fresh_repeat: 1.week # minimum "fresh" refetch after success (ie ignore mementos)
-        fresh_retry: 1.day   # minimum "fresh" retry after error (ie ignore mementos)
-      })
-    end
+      settings.scheduler = Fetchable::Schedulers::SimpleScheduler.new(
+        success_wait: 1.hour,
+        fail_wait: 2.hours
+      )
 
-    Image.due_for_repeat_fetch.each { |i| i.fetch(hard: true) }
+    Image.ready_for_fetch.find_each { |i| i.fetch }
 
-### Other Features (not doc'd yet)
+### Performing fetches
 
-* Retain resource body, either on file system or in DB
+Fetchable includes some basic support for performing the actual fetches.
 
 ### Future plans
 
@@ -94,8 +91,16 @@ column and a string 'url' column.
 
 ### Contributing
 
-Contributions are welcome. Please include tests and ensure it passes [Travis](https://travis-ci.org/playerfm/fetchable).
+Contributions are welcome. Please include tests and ensure it passes
+[Travis](https://travis-ci.org/playerfm/fetchable). Run tests as follows (I
+have brake aliased to `bundle exec rake` and the project includes single\test
+gem for convenience):
 
-It's much faster to run tests locally by running the
-[testdata](https://github.com/playerfm/testdata) server locally, but it works
-fine using the remote version too.
+> brake # runs all tests
+> brake test:FetchableTest # run a single test class
+> brake test:FetchableTest:test\_attribs # run a single test method
+
+By default, the test web host is the remote TestData instance at
+http://testdata.player.fm. It's faster to run tests locally by installing the
+[testdata](https://github.com/playerfm/testdata) server. Once running on your
+machine, point the environment variable TESTDATA\_HOST to your local server.

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 1) do
+ActiveRecord::Schema.define(version: 2) do
 
   create_table "documents", force: true do |t|
     t.string   "url"
@@ -23,12 +23,31 @@ ActiveRecord::Schema.define(version: 1) do
     t.string   "redirect_chain"
     t.string   "permanent_redirect_url"
     t.integer  "fail_count",             default: 0
-    t.datetime "next_fetch_after"
+    t.datetime "next_fetch_after",       default: '1970-01-01 00:00:00'
     t.datetime "fetched_at"
     t.datetime "refetched_at"
     t.datetime "failed_at"
     t.datetime "tried_at"
     t.integer  "word_count"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "resources", force: true do |t|
+    t.string   "url"
+    t.integer  "status_code"
+    t.datetime "last_modified"
+    t.integer  "size"
+    t.string   "etag"
+    t.string   "fingerprint"
+    t.string   "redirect_chain"
+    t.string   "permanent_redirect_url"
+    t.integer  "fail_count",             default: 0
+    t.datetime "next_fetch_after",       default: '1970-01-01 00:00:00'
+    t.datetime "fetched_at"
+    t.datetime "refetched_at"
+    t.datetime "failed_at"
+    t.datetime "tried_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
