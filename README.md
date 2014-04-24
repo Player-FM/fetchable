@@ -1,6 +1,7 @@
 ### Acts As Fetchable
 
-This Rails plugin helps you sync ActiveRecords with remote resources. It's
+This Rails plugin helps you sync ActiveRecords with any online content, such as
+web pages, images, RSS feeds, or anything else you need to sync with. It's
 convenient for writing bots, scrapers, and the like.
 
 Notes:
