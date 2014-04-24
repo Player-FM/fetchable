@@ -10,27 +10,29 @@ module Fetchable
   extend ActiveSupport::Concern
 
   module ClassMethods
-
-    cattr_accessor :callbacks, :settings
-
-    self.settings = Hashie::Mash.new
-    self.callbacks = Hashie::Mash.new
-
-    %w(before_fetch after_fetch after_fetch_update after_refetch after_fetch_redirect after_fetch_error).each { |event|
-      self.callbacks[event]=[]
-      define_method(event.to_sym) { |handler| self.callbacks[event] << handler }
-    }
-
+    #cattr_accessor :fetchable_callbacks, :fetchable_settings
+    def acts_as_fetchable(options={})
+      @fetchable_settings = Hashie::Mash.new(options)
+      @fetchable_callbacks = Hashie::Mash.new
+      %w(before_fetch after_fetch after_fetch_update after_refetch after_fetch_redirect after_fetch_error).each { |event|
+        @fetchable_callbacks[event]=[]
+        define_singleton_method(event.to_sym) { |handler| self.fetchable_callbacks[event] << handler }
+      }
+    end
+    def fetchable_settings ; @fetchable_settings; end
+    def fetchable_callbacks ; @fetchable_callbacks; end
+    def ready_for_fetch
+      where('? >= next_fetch_after', DateTime.now).order(:next_fetch_after)
+    end
   end
 
   included do
     serialize :redirect_chain
     attr_reader :body
-    scope :ready_for_fetch, -> { where('? >= next_fetch_after', DateTime.now).order(:next_fetch_after) }
   end
 
-  def call_callbacks(event)
-    self.class.callbacks[event].each { |c| self.send(c) }
+  def call_fetchable_callbacks(event)
+    self.class.fetchable_callbacks[event].each { |c| self.send(c) }
   end
 
   # Convenient shorthands
@@ -39,27 +41,27 @@ module Fetchable
   def redirected_to ; self.redirect_chain.last[:url] if self.redirect_chain ; end
 
   # Delegating to strategies
-  def store_key ; self.class.settings[:store].key_of(self) ; end
+  def store_key ; self.class.fetchable_settings[:store].key_of(self) ; end
   #def ready_for_fetch ; self.class.settings[:scheduler].ready_for_fetch(self.class) ; end
 
   def fetch(options={})
 
-    self.call_callbacks :before_fetch
+    self.call_fetchable_callbacks :before_fetch
     options = Hashie::Mash.new(options.reverse_merge(limit: 5))
     response, options, redirect_chain = Fetchable::Fetcher.deep_fetch(self, self.url, [], options)
     now = DateTime.now
     self.assign_from_rest_response(response, options, redirect_chain, now)
 
     #byebug
-    if scheduler = self.class.settings.scheduler
+    if scheduler = self.class.fetchable_settings.scheduler
       self.next_fetch_after = now + scheduler.next_fetch_wait(self)
     end
 
-    if response.status!=304 and store = self.class.settings[:store]
+    if response.status!=304 and store = self.class.fetchable_settings[:store]
       store.save_content(self, response, options)
     end
 
-    self.call_callbacks_based_on_response(response)
+    self.call_fetchable_callbacks_based_on_response(response)
     self.save!
 
   end
@@ -102,14 +104,14 @@ module Fetchable
     self.tried_at = now
   end
 
-  def call_callbacks_based_on_response(response)
+  def call_fetchable_callbacks_based_on_response(response)
     # normally error would be >= 400, but here it's >= 300 because a final redirect
     # status implies we hit the redirect limit
-    self.call_callbacks(:after_fetch_error) if self.status_code >= 300
-    self.call_callbacks(:after_refetch) if self.status_code==304
-    self.call_callbacks(:after_fetch_update) if self.fingerprint!=@previous_fingerprint
-    self.call_callbacks(:after_fetch_redirect) if self.redirect_chain.present?
-    self.call_callbacks(:after_fetch)
+    self.call_fetchable_callbacks(:after_fetch_error) if self.status_code >= 300
+    self.call_fetchable_callbacks(:after_refetch) if self.status_code==304
+    self.call_fetchable_callbacks(:after_fetch_update) if self.fingerprint!=@previous_fingerprint
+    self.call_fetchable_callbacks(:after_fetch_redirect) if self.redirect_chain.present?
+    self.call_fetchable_callbacks(:after_fetch)
   end
 
   def calculate_permanent_redirect_url
@@ -123,4 +125,8 @@ module Fetchable
     the_url
   end
 
+end
+
+class ActiveRecord::Base
+  include Fetchable
 end

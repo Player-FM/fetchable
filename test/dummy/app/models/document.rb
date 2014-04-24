@@ -1,13 +1,10 @@
 class Document < ActiveRecord::Base
 
-  include Fetchable
-
-  settings.store = Fetchable::Stores::FileStore.new(
+  acts_as_fetchable store: Fetchable::Stores::FileStore.new(
     folder: '/tmp/testing',
     name_prefix: 'doco' 
-  )
-
-  settings.scheduler = Fetchable::Schedulers::SimpleScheduler.new(
+  ),
+  scheduler: Fetchable::Schedulers::SimpleScheduler.new(
     success_wait: 1.hour,
     fail_wait: 2.hours
   )

@@ -7,7 +7,7 @@ module Fetchable
     end
 
     module InstanceMethods
-      def fetchable
+      def fetchable_attribs
         column :url, :string
 
         # call properties

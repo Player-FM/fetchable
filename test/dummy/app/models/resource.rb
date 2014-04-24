@@ -1,3 +1,3 @@
 class Resource < ActiveRecord::Base
-  include Fetchable
+  acts_as_fetchable
 end

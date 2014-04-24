@@ -14,7 +14,7 @@ class SchedulerTest < ActiveSupport::TestCase
 
     Timecop.freeze(now) do
 
-      Document.settings.scheduler = Fetchable::Schedulers::SimpleScheduler.new(
+      Document.fetchable_settings.scheduler = Fetchable::Schedulers::SimpleScheduler.new(
         success_wait: 1.hour,
         fail_wait: 2.days
       )
@@ -30,7 +30,7 @@ class SchedulerTest < ActiveSupport::TestCase
 
   def test_decaying_scheduler_sucess
 
-    Document.settings.scheduler = DECAYER
+    Document.fetchable_settings.scheduler = DECAYER
 
     Timecop.freeze(now) do
       greeting.fetch
@@ -43,7 +43,7 @@ class SchedulerTest < ActiveSupport::TestCase
 
     start = now
     future = nil
-    Document.settings.scheduler = DECAYER
+    Document.fetchable_settings.scheduler = DECAYER
     greeting.url = Dummy::test_file(name: 'does-not-exist')
 
     Timecop.freeze(start) do
@@ -75,7 +75,7 @@ class SchedulerTest < ActiveSupport::TestCase
 
   def test_ready_for_fetch_query
 
-    Document.settings.scheduler = Fetchable::Schedulers::SimpleScheduler.new(
+    Document.fetchable_settings.scheduler = Fetchable::Schedulers::SimpleScheduler.new(
       success_wait: 1.hour,
       fail_wait: 2.days
     )
