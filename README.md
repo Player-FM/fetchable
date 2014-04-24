@@ -1,4 +1,4 @@
-### Fetchable
+### Acts As Fetchable
 
 This Rails plugin helps you sync ActiveRecords with remote resources. It's
 convenient for writing bots, scrapers, and the like.
@@ -14,25 +14,20 @@ Notes:
 Fetchable retains call results for you.
 
     class Image < ActiveRecord::Base
-      include Fetchable
+      acts_as_fetchable
     end
 
     image = Image.create(url: 'http://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png')
     image.fetch
+    image.store_key # "/public/image123"
+    File.exists?(image.store_key) # 123
     puts image.resource.size # 12345
     puts image.live_resource? # true
 
-### Storage
-
-Fetchable optionally stores the retrieved payload via pluggable storage modules.
-
-    image.fetch
-    MyImageTool.brighten!(file_path: image.store_key)
-
 ### Re-fetch support
 
-Fetchable conserves energy. HTTP "memento" standards (eTags and timestamp) are
-leveraged to avoid unnecessarily repeating stuff.
+Fetchable conserves internet energy. HTTP "memento" standards (eTags and
+timestamp) are leveraged to avoid unnecessary work.
 
     image.fetch # first fetch creates a resource record
     puts image.status # 200
@@ -41,12 +36,12 @@ leveraged to avoid unnecessarily repeating stuff.
 
 ### Callbacks
 
-Fetchable lets you register for interesting events, just like the usual
+Fetchable lets you register for interesting fetch events, just like the usual
 ActiveRecord callbacks.
 
     class Image < ActiveRecord::Base
 
-      include Fetchable
+      acts_as_fetchable
 
       before_fetch :cancel_if_server_too_busy
       after_fetch_update :save_image_dimensions
@@ -56,30 +51,43 @@ ActiveRecord callbacks.
 
     end
 
+### Flexible Storage
+
+Fetchable can store the retrieved payload where you want it (or not at all).
+
+    acts_as_fetchable store: Fetchable::Stores::DBStore.new(column: 'content')
+    image.fetch
+    image.pluck(:content) # image data
+
 ### Scheduling fetches
 
 Fetchable helps you schedule recurring fetches.
 
-    class Image
-      settings.scheduler = Fetchable::Schedulers::SimpleScheduler.new(
-        success_wait: 1.hour,
-        fail_wait: 2.hours
-      )
-
-    Image.ready_for_fetch.find_each { |i| i.fetch }
+  class Image
+    acts_as_fetchable scheduler: Fetchable::Schedulers::SimpleScheduler.new(
+      success_wait: 1.hour,
+      fail_wait: 2.hours
+    )
+  end
+  Image.ready\_for\_fetch.find\_each { |i| i.fetch }
 
 ### Performing fetches
 
-Fetchable includes some basic support for performing the actual fetches.
+Fetchable includes basic support for performing the actual fetches via Runners
+which can be run as cronjobs. Apps with large fetching demands should probably
+fetch using a worker queuing system like Resque, Sidekiq, or Sneakers.
 
 ### Future plans
 
 Track permanent redirects in another table
 
 Possible options in the future:
-* Migration support
-* changed\_at: Recognise same content transmission via fingerprint (pseudo-304)
-* Enforce unique URLs (and maybe canonical URLs)
+* detect file type
+* changed\_at: Recognise same content transmission via fingerprint (pseudo-304) and allowing the app developer to decide if a file has semantically changed by returning true/false to the after\_fetch callback.
+* diagnostic logs
+* smart scheduling - using previous change-events to predict next fetch time (e.g. [mean-3\*stdev, standad\_fetch\_period].min])
+* dynamically decide what to persist. attribs not in DB retained as local attributes
+* option to enforce unique URLs (and maybe canonical URLs)
 
 ### Setup
 
