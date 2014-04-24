@@ -5,7 +5,6 @@ PATH
       excon
       hashie
       rails (~> 4.1.0)
-      ruby-filemagic
 
 GEM
   remote: https://rubygems.org/
@@ -79,7 +78,6 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     rake (10.2.2)
-    ruby-filemagic (0.5.2)
     single_test (0.6.0)
       rake
     sprockets (2.12.0)
