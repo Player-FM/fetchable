@@ -8,6 +8,7 @@ module Fetchable
 
     module InstanceMethods
       def fetchable_attribs
+
         column :url, :string
 
         # call properties
@@ -18,6 +19,8 @@ module Fetchable
         column :fingerprint, :string
         column :redirect_chain, :string
         column :permanent_redirect_url, :string
+        column :received_content_type, :string
+        column :inferred_content_type, :string
 
         # tracking over time
         column :fail_count, :integer, default: 0, nil: false
@@ -26,6 +29,7 @@ module Fetchable
         column :refetched_at, :datetime
         column :failed_at, :datetime
         column :tried_at, :datetime
+
       end
     end
   end

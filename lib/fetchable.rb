@@ -1,6 +1,7 @@
 require 'hashie'
 require 'net/http'
 require 'excon'
+require 'filemagic'
 require 'byebug'
 project_root = File.dirname(File.absolute_path(__FILE__))
 Dir.glob(project_root + '/fetchable/**/*.rb', &method(:require))
@@ -39,6 +40,7 @@ module Fetchable
   def ok? ; self.fail_count==0 ; end
   def failed? ; self.fail_count > 0 ; end
   def redirected_to ; self.redirect_chain.last[:url] if self.redirect_chain ; end
+  def content_type ; self.received_content_type || self.inferred_content_type ; end
 
   # Delegating to strategies
   def store_key ; self.class.fetchable_settings[:store].key_of(self) ; end
@@ -52,7 +54,6 @@ module Fetchable
     now = DateTime.now
     self.assign_from_rest_response(response, options, redirect_chain, now)
 
-    #byebug
     if scheduler = self.class.fetchable_settings.scheduler
       self.next_fetch_after = now + scheduler.next_fetch_wait(self)
     end
@@ -73,6 +74,12 @@ module Fetchable
 
     self.status_code = response.status
     headers = Hashie::Mash.new(response.headers)
+
+    self.received_content_type = headers['Content-Type']
+    url_path = Addressable::URI.parse(self.url).path
+    types = MIME::Types.type_for(url_path)
+    self.inferred_content_type = types.first.content_type if types.present?
+
     self.etag = headers.Etag if headers.Etag
     self.last_modified = DateTime.parse(headers['Last-Modified']) if headers['Last-Modified']
     @previous_fingerprint = self.fingerprint
@@ -84,6 +91,7 @@ module Fetchable
       self.fingerprint = nil
       self.size = nil
     end
+
     if redirect_chain.present?
       self.redirect_chain = redirect_chain 
       self.permanent_redirect_url = calculate_permanent_redirect_url

@@ -22,6 +22,8 @@ ActiveRecord::Schema.define(version: 2) do
     t.string   "fingerprint"
     t.string   "redirect_chain"
     t.string   "permanent_redirect_url"
+    t.string   "received_content_type"
+    t.string   "inferred_content_type"
     t.integer  "fail_count",             default: 0
     t.datetime "next_fetch_after",       default: '1970-01-01 00:00:00'
     t.datetime "fetched_at"
@@ -42,6 +44,8 @@ ActiveRecord::Schema.define(version: 2) do
     t.string   "fingerprint"
     t.string   "redirect_chain"
     t.string   "permanent_redirect_url"
+    t.string   "received_content_type"
+    t.string   "inferred_content_type"
     t.integer  "fail_count",             default: 0
     t.datetime "next_fetch_after",       default: '1970-01-01 00:00:00'
     t.datetime "fetched_at"

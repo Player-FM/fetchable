@@ -3,8 +3,8 @@ require_relative '../test_helper'
 class LoopRunnerTest < ActiveSupport::TestCase
 
   def setup
-    10.times { |feed| 
-      Resource.create(url: 'http://testdata.player.fm/?time=30')
+    3.times { |count| 
+      Resource.create(url: Dummy::test_feed(time: count))
     }
   end
 

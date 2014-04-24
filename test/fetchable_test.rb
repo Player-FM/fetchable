@@ -28,10 +28,20 @@ class FetchableTest < ActiveSupport::TestCase
       assert_equal FAREWELL_ETAG, farewell.etag
       assert_equal FAREWELL_SIZE, farewell.size
       assert_equal FAREWELL_FINGERPRINT, farewell.fingerprint
+      assert_equal 'text/plain', farewell.received_content_type
+      assert_equal 'text/plain', farewell.content_type
       assert_equal 0, farewell.fail_count
       assert_equal now, farewell.tried_at
       assert_equal now, farewell.fetched_at
     end
+  end
+
+  def test_infer_filetype
+    farewell = Document.create(url: Dummy::test_file(name: 'farewell.txt', type: 'image/gif'))
+    farewell.fetch
+    assert_equal 'image/gif', farewell.received_content_type
+    assert_equal 'application/x-httpd-php', farewell.inferred_content_type
+    assert_equal 'image/gif', farewell.content_type
   end
 
   def test_attribs_when_unfetched
