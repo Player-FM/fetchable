@@ -18,13 +18,13 @@ module Fetchable
       end
 
       def next_fetch_wait(fetchable)
-        case fetchable.fail_count
+        case fetchable.fetch_fail_count
         when 0
           @success_wait
         when 1..fail_tries
           @fail_wait
         else
-          error_tries = fetchable.fail_count - fail_tries - 1 # subtract 1 so first error try is zeto'th
+          error_tries = fetchable.fetch_fail_count - fail_tries - 1 # subtract 1 so first error try is zeto'th
           (@error_wait*@error_wait_decay**error_tries).seconds
         end
       end

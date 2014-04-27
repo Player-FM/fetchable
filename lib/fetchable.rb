@@ -36,8 +36,8 @@ module Fetchable
   end
 
   # Convenient shorthands
-  def ok? ; self.fail_count==0 ; end
-  def failed? ; self.fail_count > 0 ; end
+  def ok? ; self.fetch_fail_count==0 ; end
+  def failed? ; self.fetch_fail_count > 0 ; end
   def redirected_to ; self.redirect_chain.last[:url] if self.redirect_chain ; end
   def content_type ; self.received_content_type || self.inferred_content_type ; end
 
@@ -99,16 +99,14 @@ module Fetchable
     end
 
     if [200,304].include?(response.status)
-      self.fail_count = 0
-      self.fetched_at = now
-      self.refetched_at = now if response.status==304
+      self.fetch_fail_count = 0
+      self.fetch_succeeded_at = now
     else
-      self.fail_count ||= 0
-      self.fail_count += 1
-      self.failed_at = now
+      self.fetch_fail_count ||= 0
+      self.fetch_fail_count += 1
     end
 
-    self.tried_at = now
+    self.fetch_tried_at = now
   end
 
   def call_fetchable_callbacks_based_on_response(response)

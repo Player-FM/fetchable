@@ -27,12 +27,10 @@ ActiveRecord::Schema.define(version: 4) do
     t.string   "permanent_redirect_url"
     t.string   "received_content_type"
     t.string   "inferred_content_type"
-    t.integer  "fail_count",             default: 0
+    t.integer  "fetch_fail_count",       default: 0
     t.datetime "next_fetch_after",       default: '1970-01-01 00:00:00'
-    t.datetime "fetched_at"
-    t.datetime "refetched_at"
-    t.datetime "failed_at"
-    t.datetime "tried_at"
+    t.datetime "fetch_tried_at"
+    t.datetime "fetch_succeeded_at"
   end
 
   create_table "resources", force: true do |t|
@@ -46,12 +44,10 @@ ActiveRecord::Schema.define(version: 4) do
     t.string   "permanent_redirect_url"
     t.string   "received_content_type"
     t.string   "inferred_content_type"
-    t.integer  "fail_count",             default: 0
+    t.integer  "fetch_fail_count",       default: 0
     t.datetime "next_fetch_after",       default: '1970-01-01 00:00:00'
-    t.datetime "fetched_at"
-    t.datetime "refetched_at"
-    t.datetime "failed_at"
-    t.datetime "tried_at"
+    t.datetime "fetch_tried_at"
+    t.datetime "fetch_succeeded_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

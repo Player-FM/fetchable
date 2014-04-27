@@ -19,12 +19,10 @@ module Fetchable
       [:inferred_content_type, :string],
 
       # tracking over time
-      [:fail_count, :integer, default: 0, nil: false],
+      [:fetch_fail_count, :integer, default: 0, nil: false],
+      [:fetch_tried_at, :datetime],
+      [:fetch_succeeded_at, :datetime],
       [:next_fetch_after, :datetime, default: DateTime.new(1970,1,1), nil: false],
-      [:fetched_at, :datetime],
-      [:refetched_at, :datetime],
-      [:failed_at, :datetime],
-      [:tried_at, :datetime],
 
     ]
 
