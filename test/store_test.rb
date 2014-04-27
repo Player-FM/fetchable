@@ -12,4 +12,14 @@ class StoreTest < ActiveSupport::TestCase
     assert_equal GREETING_CONTENT, open(expected_path).read.chomp
   end
 
+  def test_image
+    Resource.fetchable_settings.store = Fetchable::Stores::FileStore.new
+    place = Resource.create(url: 'http://placehold.it/100x100.jpg')
+    place.fetch
+    expected_path = "#{Rails.root}/public/fetchables/res#{Fetchable::Util.encode(place.id)}.jpeg"
+    assert_equal expected_path, place.store_key
+    assert File.exist?(expected_path), "no file at #{expected_path}"
+  end
+
+
 end

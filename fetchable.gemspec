@@ -8,11 +8,11 @@ Gem::Specification.new do |s|
 
   s.name        = "fetchable"
   s.version     = Fetchable::VERSION
-  s.authors     = ["TODO: Your name"]
-  s.email       = ["TODO: Your email"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of Fetchable."
-  s.description = "TODO: Description of Fetchable."
+  s.authors     = ["Michael Mahemoff"]
+  s.email       = ["michael@mahemoff.com"]
+  s.homepage    = "https://mahemoff.com"
+  s.summary     = "Sync your active records with remote resources"
+  s.description = "By including acts_as_fetchable in your model, you can run a fetch command which will download content specified by the model's 'url' property. The content and call data will be stored and events will be triggered throughout the fetch lifecycle (e.g. after_fetch_error). Support for scheduling recurring fetches is provided."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]

@@ -28,7 +28,8 @@ module Fetchable
       end
 
       def self.determine_extension(fetchable)
-        types = MIME::Types[fetchable.content_type]
+        types = MIME::Types[fetchable.received_content_type]
+        types = MIME::Types[fetchable.inferred_content_type] if types.blank?
         if types and types.first and extension = types.first.extensions[0]
           ".#{extension}"
         else
