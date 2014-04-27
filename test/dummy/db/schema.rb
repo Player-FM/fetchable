@@ -11,9 +11,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2) do
+ActiveRecord::Schema.define(version: 4) do
 
   create_table "documents", force: true do |t|
+    t.integer  "word_count"
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "url"
     t.integer  "status_code"
     t.datetime "last_modified"
@@ -30,9 +33,6 @@ ActiveRecord::Schema.define(version: 2) do
     t.datetime "refetched_at"
     t.datetime "failed_at"
     t.datetime "tried_at"
-    t.integer  "word_count"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "resources", force: true do |t|

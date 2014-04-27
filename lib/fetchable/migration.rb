@@ -2,37 +2,63 @@
 
 module Fetchable
   module MigrationHelper
+
+    COLUMNS = [
+
+      [:url, :string],
+
+      # call properties
+      [:status_code, :integer],
+      [:last_modified, :datetime],
+      [:size, :integer],
+      [:etag, :string],
+      [:fingerprint, :string],
+      [:redirect_chain, :string],
+      [:permanent_redirect_url, :string],
+      [:received_content_type, :string],
+      [:inferred_content_type, :string],
+
+      # tracking over time
+      [:fail_count, :integer, default: 0, nil: false],
+      [:next_fetch_after, :datetime, default: DateTime.new(1970,1,1), nil: false],
+      [:fetched_at, :datetime],
+      [:refetched_at, :datetime],
+      [:failed_at, :datetime],
+      [:tried_at, :datetime],
+
+    ]
+
     def self.included(base) # :nodoc:
       base.send(:include, InstanceMethods)
     end
 
     module InstanceMethods
+
       def fetchable_attribs
 
-        column :url, :string
-
-        # call properties
-        column :status_code, :integer
-        column :last_modified, :datetime
-        column :size, :integer
-        column :etag, :string
-        column :fingerprint, :string
-        column :redirect_chain, :string
-        column :permanent_redirect_url, :string
-        column :received_content_type, :string
-        column :inferred_content_type, :string
-
-        # tracking over time
-        column :fail_count, :integer, default: 0, nil: false
-        column :next_fetch_after, :datetime, default: DateTime.new(1970,1,1), nil: false
-        column :fetched_at, :datetime
-        column :refetched_at, :datetime
-        column :failed_at, :datetime
-        column :tried_at, :datetime
+        COLUMNS.each { |col|
+          column *col
+        }
 
       end
+
     end
+
   end
 end
 
 ActiveRecord::ConnectionAdapters::TableDefinition.send(:include, Fetchable::MigrationHelper)
+
+module ActiveRecord
+  class Migration
+    
+      def add_fetchable_attribs(table)
+
+        Fetchable::MigrationHelper::COLUMNS.each { |col|
+          add_column *([table].concat(col)) unless column_exists?(table, col[0])
+        }
+
+      end
+
+  end
+end

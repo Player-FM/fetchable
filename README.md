@@ -1,8 +1,14 @@
 ### Acts As Fetchable
 
 This Rails plugin helps you sync ActiveRecords with any online content, such as
-web pages, images, RSS feeds, or anything else you need to sync with. It's
-convenient for writing bots, scrapers, and the like.
+web pages, images, RSS feeds. Examples of use:
+
+* Periodically access your users' Twitter profiles so you can store their
+  latest bios and image URLs.
+* Save a batch of specified images. For example, cache users' social media
+  avatars as you normally can't hot-link them.
+* Periodically parse some RSS feeds.
+* Make a small search engine by periodically retrieving a list of sites.
 
 Notes:
 
@@ -12,7 +18,7 @@ Notes:
 
 ### Basic usage
 
-Fetchable retains call results for you.
+Fetchable makes HTTP calls for you, retaining the results.
 
     class Image < ActiveRecord::Base
       acts_as_fetchable
@@ -27,7 +33,7 @@ Fetchable retains call results for you.
 
 ### Re-fetch support
 
-Fetchable conserves internet energy. HTTP "memento" standards (eTags and
+Fetchable conserves internet energy. HTTP "memento" standards (ETags and
 timestamp) are leveraged to avoid unnecessary work.
 
     image.fetch # first fetch creates a resource record
@@ -37,7 +43,7 @@ timestamp) are leveraged to avoid unnecessary work.
 
 ### Callbacks
 
-Fetchable lets you register for interesting fetch events, just like the usual
+Fetchable lets you register for interesting fetch events, just like the regular
 ActiveRecord callbacks.
 
     class Image < ActiveRecord::Base
@@ -72,11 +78,12 @@ Fetchable helps you schedule recurring fetches.
   end
   Image.ready\_for\_fetch.find\_each { |i| i.fetch }
 
-### Performing fetches
+### Batch fetching
 
-Fetchable includes basic support for performing the actual fetches via Runners
-which can be run as cronjobs. Apps with large fetching demands should probably
-fetch using a worker queuing system like Resque, Sidekiq, or Sneakers.
+Fetchable includes basic support for batch-fetching all of your records via
+Runners which can be run as cronjobs. Apps with large fetching demands should
+probably fetch using a worker queuing system like Resque, Sidekiq, or Sneakers.
+Some examples will appear here for using those.
 
 ### Future plans
 
@@ -92,24 +99,47 @@ Possible options in the future:
 
 ### Setup
 
-Create a "resources" table. For now, [see this
-example](https://github.com/playerfm/fetchable/blob/master/test/dummy/db/migrate/01_create_resources.rb).
+Create or update your model using the "fetchable\_attribs" migration helper demonstrated below. The update helper will add whatever extra columns are required, so you should be able to run it to upgrade to the latest version of this library. (It makes no attempt to delete any deprecated columns, you'll need to do that yourself if you feel the data can be discarded.) It will create the necessary attributes. If you prefer to do it manually, [here is the list of attributes](lib/fetchable/migration) your table needs.
 
-For each of your fetchable classes, add a add an integer `resource_id` int
-column and a string 'url' column.
+    # Make a new fetchable model
+    class CreateDocuments < ActiveRecord::Migration
+      def change
+        create_table :documents do |t|
+          t.integer :word_count
+          t.fetchable_attribs
+          t.timestamps
+        end
+      end
+    end
+
+    # Make existing model fetchable
+    class UpdateDocuments < ActiveRecord::Migration
+      def change
+        add_fetchable_attribs(:documents)
+      end
+    end
+
+  The class simply needs to include `acts_as_fetchable` as shown in the examples above.
+
+  class Document < ActiveRecord::Base
+    acts_as_fetchable
+  end
 
 ### Contributing
 
-Contributions are welcome. Please include tests and ensure it passes
-[Travis](https://travis-ci.org/playerfm/fetchable). Run tests as follows (I
-have brake aliased to `bundle exec rake` and the project includes single\test
-gem for convenience):
+Pull requests are welcome. Please include test coverage for any new feature and
+ensure it passes [Travis](https://travis-ci.org/playerfm/fetchable). You can
+run tests as follows (convenient syntax thanks to single\_test gem for
+convenient specification of the test cases):
 
+> alias brake='bundle exec rake' # it's just easier, innit
 > brake # runs all tests
 > brake test:FetchableTest # run a single test class
 > brake test:FetchableTest:test\_attribs # run a single test method
 
-By default, the test web host is the remote TestData instance at
-http://testdata.player.fm. It's faster to run tests locally by installing the
-[testdata](https://github.com/playerfm/testdata) server. Once running on your
-machine, point the environment variable TESTDATA\_HOST to your local server.
+The tests make calls to a TestData instance at http://testdata.player.fm, which
+is a project that provides controllable and deterministic example RESTful
+calls. The remote server is fine, but it's faster to run tests locally by
+installing the [testdata](https://github.com/playerfm/testdata) server if
+you're so inclined.  Once running on your machine, point the environment
+variable TESTDATA\_HOST to your local server.
