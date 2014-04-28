@@ -40,6 +40,9 @@ module Fetchable
   def failed? ; self.fetch_fail_count > 0 ; end
   def redirected_to ; self.redirect_chain.last[:url] if self.redirect_chain ; end
   def content_type ; self.received_content_type || self.inferred_content_type ; end
+  def purge_mementos
+    self.update_attributes etag: nil, last_modified: nil
+  end
 
   # Delegating to strategies
   def store_key ; self.class.fetchable_settings[:store].key_of(self) ; end
@@ -104,6 +107,10 @@ module Fetchable
     else
       self.fetch_fail_count ||= 0
       self.fetch_fail_count += 1
+    end
+
+    if self.fingerprint_changed?
+      self.fetch_changed_at = now
     end
 
     self.fetch_tried_at = now

@@ -44,6 +44,32 @@ class FetchableTest < ActiveSupport::TestCase
     assert_equal 'image/gif', farewell.content_type
   end
 
+  def test_change_tracking
+
+    start = now
+
+    Timecop.freeze(start) do
+      greeting.fetch
+      assert_equal start, greeting.fetch_changed_at
+    end
+
+    Timecop.freeze(start+5.minutes) do
+      greeting.purge_mementos
+      greeting.fetch
+      assert_equal start, greeting.fetch_changed_at
+    end
+
+    Timecop.freeze(start+10.minutes) do
+      greeting.url = Dummy::test_file(name: 'farewell.txt')
+      greeting.purge_mementos
+      greeting.fetch
+      #assert greeting.changed?
+      assert_equal start+10.minutes, greeting.fetch_changed_at
+      # todo change event
+    end
+
+  end
+
   def test_attribs_when_unfetched
     greeting.url = Dummy::test_file(etag: '_', last_modified: '_')
     greeting.fetch
