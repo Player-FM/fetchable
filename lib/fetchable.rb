@@ -14,7 +14,7 @@ module Fetchable
     def acts_as_fetchable(options={})
       @fetchable_settings = Hashie::Mash.new(options)
       @fetchable_callbacks = Hashie::Mash.new
-      %w(before_fetch after_fetch after_fetch_update after_refetch after_fetch_redirect after_fetch_error).each { |event|
+      %w(before_fetch after_fetch after_fetch_change after_refetch after_fetch_redirect after_fetch_error).each { |event|
         @fetchable_callbacks[event]=[]
         define_singleton_method(event.to_sym) { |handler| self.fetchable_callbacks[event] << handler }
       }
@@ -40,6 +40,7 @@ module Fetchable
   def failed? ; self.fetch_fail_count > 0 ; end
   def redirected_to ; self.redirect_chain.last[:url] if self.redirect_chain ; end
   def content_type ; self.received_content_type || self.inferred_content_type ; end
+  def changed? ; self.fingerprint_changed? ; end
   def purge_mementos
     self.update_attributes etag: nil, last_modified: nil
   end
@@ -121,7 +122,7 @@ module Fetchable
     # status implies we hit the redirect limit
     self.call_fetchable_callbacks(:after_fetch_error) if self.status_code >= 300
     self.call_fetchable_callbacks(:after_refetch) if self.status_code==304
-    self.call_fetchable_callbacks(:after_fetch_update) if self.fingerprint!=@previous_fingerprint
+    self.call_fetchable_callbacks(:after_fetch_change) if self.fingerprint!=@previous_fingerprint
     self.call_fetchable_callbacks(:after_fetch_redirect) if self.redirect_chain.present?
     self.call_fetchable_callbacks(:after_fetch)
   end

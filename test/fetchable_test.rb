@@ -63,9 +63,7 @@ class FetchableTest < ActiveSupport::TestCase
       greeting.url = Dummy::test_file(name: 'farewell.txt')
       greeting.purge_mementos
       greeting.fetch
-      #assert greeting.changed?
       assert_equal start+10.minutes, greeting.fetch_changed_at
-      # todo change event
     end
 
   end
