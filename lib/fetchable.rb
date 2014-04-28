@@ -85,7 +85,6 @@ module Fetchable
 
     self.etag = headers.Etag if headers.Etag
     self.last_modified = DateTime.parse(headers['Last-Modified']) if headers['Last-Modified']
-    @previous_fingerprint = self.fingerprint
     if response.body.present?
       self.fingerprint = Base64.strict_encode64(Digest::SHA256.new.digest(response.body))
       self.size = response.body.length
@@ -122,7 +121,7 @@ module Fetchable
     # status implies we hit the redirect limit
     self.call_fetchable_callbacks(:after_fetch_error) if self.status_code >= 300
     self.call_fetchable_callbacks(:after_refetch) if self.status_code==304
-    self.call_fetchable_callbacks(:after_fetch_change) if self.fingerprint!=@previous_fingerprint
+    self.call_fetchable_callbacks(:after_fetch_change) if self.fingerprint_changed?
     self.call_fetchable_callbacks(:after_fetch_redirect) if self.redirect_chain.present?
     self.call_fetchable_callbacks(:after_fetch)
   end

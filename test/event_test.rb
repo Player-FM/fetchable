@@ -14,7 +14,7 @@ class EventTest < ActiveSupport::TestCase
     assert_equal 'ohai', greeting.body
   end
 
-  def test_updated_fetch_event
+  def test_fetch_chage_fires_iff_content_changes
 
     greeting.fetch
 
