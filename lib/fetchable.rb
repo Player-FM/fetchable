@@ -62,7 +62,7 @@ module Fetchable
     end
 
     if response.status!=304 and store = self.class.fetchable_settings[:store]
-      store.save_content(self, response, options)
+      store.save_content(self, response, now, options)
     end
 
     self.call_fetchable_callbacks_based_on_response(response)

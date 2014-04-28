@@ -26,8 +26,10 @@ module Fetchable
         "#{folder}/#{filename}"
       end
 
-      def save_content(fetchable, response, options)
-        File.open(self.key_of(fetchable), 'wb') {|f| f.write(response.body) }
+      def save_content(fetchable, response, now, options)
+        if fetchable.fetch_changed_at==now
+          File.open(self.key_of(fetchable), 'wb') {|f| f.write(response.body) }
+        end
       end
 
       def self.determine_extension(fetchable)
