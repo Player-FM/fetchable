@@ -28,9 +28,10 @@ ActiveRecord::Schema.define(version: 4) do
     t.string   "received_content_type"
     t.string   "inferred_content_type"
     t.integer  "fetch_fail_count",       default: 0
-    t.datetime "next_fetch_after",       default: '1970-01-01 00:00:00'
     t.datetime "fetch_tried_at"
     t.datetime "fetch_succeeded_at"
+    t.datetime "fetch_changed_at"
+    t.datetime "next_fetch_after",       default: '1970-01-01 00:00:00'
   end
 
   create_table "resources", force: true do |t|
@@ -45,9 +46,10 @@ ActiveRecord::Schema.define(version: 4) do
     t.string   "received_content_type"
     t.string   "inferred_content_type"
     t.integer  "fetch_fail_count",       default: 0
-    t.datetime "next_fetch_after",       default: '1970-01-01 00:00:00'
     t.datetime "fetch_tried_at"
     t.datetime "fetch_succeeded_at"
+    t.datetime "fetch_changed_at"
+    t.datetime "next_fetch_after",       default: '1970-01-01 00:00:00'
     t.datetime "created_at"
     t.datetime "updated_at"
   end

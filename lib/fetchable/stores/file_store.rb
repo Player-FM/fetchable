@@ -11,6 +11,7 @@ module Fetchable
         #byebug
         @folder = settings.folder # we have to defer the default as Rails.root doesn't exist yet
         @name_prefix = settings.name_prefix || "res"
+        @subfolder_amount = settings.subfolder_amount || 1000
       end
 
       def get_folder
@@ -18,12 +19,14 @@ module Fetchable
       end
 
       def key_of(fetchable)
-        "#{get_folder}/#{@name_prefix}#{Fetchable::Util.encode(fetchable.id)}#{self.class.determine_extension fetchable}"
+        folder = "#{get_folder}"
+        folder += "/#{fetchable.id % @subfolder_amount}" if @subfolder_amount > 0
+        FileUtils.mkdir_p(folder) unless File.directory?(folder)
+        filename = "#{@name_prefix}#{Fetchable::Util.encode(fetchable.id)}#{self.class.determine_extension fetchable}"
+        "#{folder}/#{filename}"
       end
 
       def save_content(fetchable, response, options)
-        folder = get_folder
-        FileUtils.mkdir_p(folder) unless File.directory?(folder)
         File.open(self.key_of(fetchable), 'wb') {|f| f.write(response.body) }
       end
 

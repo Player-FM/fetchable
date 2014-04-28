@@ -1,2 +1,3 @@
 greeting:
+  id: 1000
   url: "<%= Dummy::test_file(name: 'greeting.txt') %>"
