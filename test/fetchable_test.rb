@@ -39,7 +39,7 @@ class FetchableTest < ActiveSupport::TestCase
   def test_validate_url
     assert greeting.valid?
     greeting.url = 'not a url'
-    assert !greeting.valid?
+    assert_not_nil greeting.errors[:url]
   end
 
   def test_infer_filetype
