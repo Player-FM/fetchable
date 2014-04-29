@@ -2,7 +2,6 @@ require 'hashie'
 require 'net/http'
 require 'excon'
 require 'byebug'
-require 'validate_url'
 project_root = File.dirname(File.absolute_path(__FILE__))
 Dir.glob(project_root + '/fetchable/**/*.rb', &method(:require))
 

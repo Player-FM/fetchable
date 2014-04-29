@@ -5,7 +5,6 @@ PATH
       excon
       hashie
       rails (~> 4.1.0)
-      validate_url
 
 GEM
   remote: https://rubygems.org/
@@ -36,13 +35,13 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
-    addressable (2.3.5)
+    addressable (2.3.6)
     arel (5.0.1.20140414130214)
     builder (3.2.2)
-    byebug (2.6.0)
-      columnize (~> 0.3)
+    byebug (3.1.2)
+      columnize (~> 0.8)
       debugger-linecache (~> 1.2)
-    columnize (0.3.6)
+    columnize (0.8.9)
     debugger-linecache (1.2.0)
     erubis (2.7.0)
     excon (0.33.0)
@@ -58,7 +57,7 @@ GEM
     minitest (5.3.3)
     mocha (1.0.0)
       metaclass (~> 0.0.1)
-    multi_json (1.9.2)
+    multi_json (1.9.3)
     polyglot (0.3.4)
     rack (1.5.2)
     rack-test (0.6.2)
@@ -78,10 +77,10 @@ GEM
       activesupport (= 4.1.0)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    rake (10.2.2)
+    rake (10.3.1)
     single_test (0.6.0)
       rake
-    sprockets (2.12.0)
+    sprockets (2.12.1)
       hike (~> 1.2)
       multi_json (~> 1.0)
       rack (~> 1.0)
@@ -100,8 +99,6 @@ GEM
       polyglot (>= 0.3.1)
     tzinfo (1.1.0)
       thread_safe (~> 0.1)
-    validate_url (0.2.0)
-      activemodel (>= 3.0.0)
 
 PLATFORMS
   ruby
