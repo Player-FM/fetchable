@@ -36,6 +36,12 @@ class FetchableTest < ActiveSupport::TestCase
     end
   end
 
+  def test_validate_url
+    assert greeting.valid?
+    greeting.url = 'not a url'
+    assert !greeting.valid?
+  end
+
   def test_infer_filetype
     farewell = Document.create(url: Dummy::test_file(name: 'farewell.txt', type: 'image/gif'))
     farewell.fetch

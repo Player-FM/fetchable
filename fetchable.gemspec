@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir["test/**/*"]
 
   s.add_dependency "rails", "~> 4.1.0"
-  %w(hashie excon)
+  %w(hashie excon validate_url)
   .each { |lib| s.add_dependency lib }
 
   %w(sqlite3 addressable byebug single_test timecop mocha)

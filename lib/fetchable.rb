@@ -2,6 +2,7 @@ require 'hashie'
 require 'net/http'
 require 'excon'
 require 'byebug'
+require 'validate_url'
 project_root = File.dirname(File.absolute_path(__FILE__))
 Dir.glob(project_root + '/fetchable/**/*.rb', &method(:require))
 
@@ -10,7 +11,6 @@ module Fetchable
   extend ActiveSupport::Concern
 
   module ClassMethods
-    #cattr_accessor :fetchable_callbacks, :fetchable_settings
     def acts_as_fetchable(options={})
       @fetchable_settings = Hashie::Mash.new(options)
       @fetchable_callbacks = Hashie::Mash.new
@@ -28,6 +28,7 @@ module Fetchable
 
   included do
     serialize :redirect_chain
+    validates :url, url: { allow_nil: true }
     attr_reader :body
   end
 
