@@ -14,8 +14,7 @@ class EventTest < ActiveSupport::TestCase
     assert_equal 'ohai', greeting.body
   end
 
-  def test_fetch_chage_fires_iff_content_changes
-
+  def test_fetch_change_fires_iff_content_changes
     greeting.fetch
 
     greeting.expects(:handle_fetch_change).never
@@ -24,6 +23,22 @@ class EventTest < ActiveSupport::TestCase
     greeting.url = Dummy::test_file(name: 'farewell.txt', last_modified: '_')
     greeting.expects(:handle_fetch_change)
     greeting.fetch
+  end
+
+  def test_change_handler_can_veto_change
+
+    start = now
+    Timecop.freeze(start) do
+      greeting.fetch
+      assert_equal start, greeting.fetch_changed_at
+    end
+    
+    Timecop.freeze(start+5.minutes) do
+      greeting.url = Dummy::test_file(name: 'farewell.txt', etag: '_', last_modified: '_')
+      greeting.stubs(:handle_fetch_change).returns(false)
+      greeting.fetch
+      assert_equal start, greeting.fetch_changed_at
+    end
 
   end
 

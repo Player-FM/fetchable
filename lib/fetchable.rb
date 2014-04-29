@@ -32,7 +32,11 @@ module Fetchable
   end
 
   def call_fetchable_callbacks(event)
-    self.class.fetchable_callbacks[event].each { |c| self.send(c) }
+    vetoed = false
+    self.class.fetchable_callbacks[event].each { |callback|
+      vetoed = true if self.send(callback)==false
+    }
+    vetoed
   end
 
   # Convenient shorthands
@@ -121,7 +125,10 @@ module Fetchable
     # status implies we hit the redirect limit
     self.call_fetchable_callbacks(:after_fetch_error) if self.status_code >= 300
     self.call_fetchable_callbacks(:after_refetch) if self.status_code==304
-    self.call_fetchable_callbacks(:after_fetch_change) if self.fingerprint_changed?
+    if self.fingerprint_changed?
+      change_vetoed = self.call_fetchable_callbacks(:after_fetch_change) 
+      self.fetch_changed_at = self.fetch_changed_at_was if change_vetoed # revert change if vetoed
+    end
     self.call_fetchable_callbacks(:after_fetch_redirect) if self.redirect_chain.present?
     self.call_fetchable_callbacks(:after_fetch)
   end
