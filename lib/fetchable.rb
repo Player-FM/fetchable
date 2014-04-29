@@ -42,7 +42,6 @@ module Fetchable
     def failed? ; self.fetch_fail_count > 0 ; end
     def redirected_to ; self.redirect_chain.last[:url] if self.redirect_chain ; end
     def content_type ; self.received_content_type || self.inferred_content_type ; end
-    def changed? ; self.fingerprint_changed? ; end
     def purge_mementos
       self.update_attributes etag: nil, last_modified: nil
     end
