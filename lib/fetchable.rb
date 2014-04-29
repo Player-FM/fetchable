@@ -34,7 +34,10 @@ module Fetchable
   def call_fetchable_callbacks(event)
     vetoed = false
     self.class.fetchable_callbacks[event].each { |callback|
-      vetoed = true if self.send(callback)==false
+      if self.send(callback)==false
+        vetoed = true
+        break
+      end
     }
     vetoed
   end
