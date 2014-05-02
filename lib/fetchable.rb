@@ -10,7 +10,7 @@ module Fetchable
   extend ActiveSupport::Concern
 
   module ClassMethods
-    def acts_as_fetchable(options={})
+    def setup(options={})
       @fetchable_settings = Hashie::Mash.new(options)
       @fetchable_callbacks = Hashie::Mash.new
       %w(before_fetch after_fetch after_fetch_change after_refetch after_fetch_redirect after_fetch_error).each { |event|
@@ -18,8 +18,8 @@ module Fetchable
         define_singleton_method(event.to_sym) { |handler| self.fetchable_callbacks[event] << handler }
       }
     end
-    def fetchable_settings ; @fetchable_settings; end
-    def fetchable_callbacks ; @fetchable_callbacks; end
+    def fetchable_settings ; @fetchable_settings ; end
+    def fetchable_callbacks ; @fetchable_callbacks ; end
     def ready_for_fetch
       where('? >= next_fetch_after', DateTime.now).order(:next_fetch_after)
     end
@@ -41,9 +41,7 @@ module Fetchable
     def failed? ; self.fetch_fail_count > 0 ; end
     def redirected_to ; self.redirect_chain.last[:url] if self.redirect_chain ; end
     def content_type ; self.received_content_type || self.inferred_content_type ; end
-    def purge_mementos
-      self.update_attributes etag: nil, last_modified: nil
-    end
+    def purge_mementos ; self.update_attributes(etag: nil, last_modified: nil) ; end
 
     def call_fetchable_callbacks(event)
       vetoed = false
@@ -63,7 +61,7 @@ module Fetchable
     def fetch(options={})
 
       self.call_fetchable_callbacks :before_fetch
-      options = Hashie::Mash.new(options.reverse_merge(limit: 5))
+      options = Hashie::Mash.new(options.reverse_merge(redirect_limit: 5))
       response, options, redirect_chain = Fetchable::Fetcher.deep_fetch(self, self.url, [], options)
       now = DateTime.now
       self.assign_from_rest_response(response, options, redirect_chain, now)
@@ -156,5 +154,8 @@ module Fetchable
 end
 
 class ActiveRecord::Base
-  include Fetchable
+  def self.acts_as_fetchable(options={})
+    include Fetchable
+    setup(options)
+  end
 end

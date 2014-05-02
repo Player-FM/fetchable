@@ -9,9 +9,9 @@ module Fetchable
       headers['if-none-match'] = fetchable.etag if fetchable.etag.present?
       headers['if-modified-since'] = fetchable.last_modified.rfc2822 if fetchable.last_modified.present?
 
-      resp = Excon.get(url, headers: headers)
+      resp = Excon.get url, headers: headers, omit_default_port: true
 
-      if [301,302].include?(resp.status) and redirect_chain.size <= options.limit
+      if [301,302].include?(resp.status) and redirect_chain.size <= options.redirect_limit
         new_url = resp.headers['location']
         if URI.parse(new_url).relative?
           old_url = Addressable::URI.parse(url)
