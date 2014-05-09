@@ -1,6 +1,6 @@
 class HistoricalQuote < Quote
 
-  after_fetch_change :handle_historical_quote
+  fetch_changed :handle_historical_quote
 
   def historical_quote ; end
 

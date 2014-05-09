@@ -9,19 +9,17 @@ class Document < ActiveRecord::Base
     fail_wait: 2.hours
   )
 
-  before_fetch :handle_before_fetch
-  after_fetch :handle_after_fetch
-  after_refetch :handle_refetch
-  after_fetch_change :handle_fetch_change
-  after_fetch_redirect :handle_fetch_redirect
-  after_fetch_error :handle_fetch_error
+  fetch_started :handle_fetch_started
+  fetch_changed :handle_fetch_changed
+  fetch_redirected :handle_fetch_redirected
+  fetch_failed :handle_fetch_failed
+  fetch_ended :handle_fetch_ended
 
   # We're just using these for mocks
-  def handle_before_fetch ; end
-  def handle_after_fetch ; end
-  def handle_refetch ; end
-  def handle_fetch_change ; end
-  def handle_fetch_error ; end
-  def handle_fetch_redirect ; end
+  def handle_fetch_started ; end
+  def handle_fetch_changed ; end
+  def handle_fetch_redirected ; end
+  def handle_fetch_failed ; end
+  def handle_fetch_ended ; end
 
 end

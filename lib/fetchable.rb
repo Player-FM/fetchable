@@ -14,7 +14,7 @@ module Fetchable
     def setup(options={})
       self.fetchable_settings = Hashie::Mash.new(options)
       self.fetchable_callbacks = Hashie::Mash.new
-      %w(before_fetch after_fetch after_fetch_change after_refetch after_fetch_redirect after_fetch_error).each { |event|
+      %w(fetch_started fetch_changed fetch_redirected fetch_failed fetch_ended).each { |event|
         self.fetchable_callbacks[event]=[]
         define_singleton_method(event.to_sym) { |handler| self.fetchable_callbacks[event] << handler }
       }
@@ -62,7 +62,7 @@ module Fetchable
 
     def fetch(options={})
 
-      self.call_fetchable_callbacks :before_fetch
+      self.call_fetchable_callbacks :fetch_started
       options = Hashie::Mash.new(options.reverse_merge(redirect_limit: 5))
       response, options, redirect_chain = Fetchable::Fetcher.deep_fetch(self, self.url, [], options)
       now = DateTime.now
@@ -78,6 +78,8 @@ module Fetchable
       if response.status!=304 and store = self.class.fetchable_settings[:store]
         store.save_content(self, response, now, options)
       end
+
+      self.call_fetchable_callbacks :fetch_ended
 
     end
     
@@ -130,14 +132,12 @@ module Fetchable
     def call_fetchable_callbacks_based_on_response(response)
       # normally error would be >= 400, but here it's >= 300 because a final redirect
       # status implies we hit the redirect limit
-      self.call_fetchable_callbacks(:after_fetch_error) if self.status_code >= 300
-      self.call_fetchable_callbacks(:after_refetch) if self.status_code==304
+      self.call_fetchable_callbacks(:fetch_failed) if self.status_code >= 300
       if self.fingerprint_changed?
-        change_vetoed = self.call_fetchable_callbacks(:after_fetch_change) 
+        change_vetoed = self.call_fetchable_callbacks(:fetch_changed) 
         self.fetch_changed_at = self.fetch_changed_at_was if change_vetoed # revert change if vetoed
       end
-      self.call_fetchable_callbacks(:after_fetch_redirect) if self.redirect_chain.present?
-      self.call_fetchable_callbacks(:after_fetch)
+      self.call_fetchable_callbacks(:fetch_redirected) if self.redirect_chain.present?
     end
 
     def calculate_permanent_redirect_url

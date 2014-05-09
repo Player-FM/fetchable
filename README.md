@@ -50,7 +50,7 @@ ActiveRecord callbacks.
 
       acts_as_fetchable
 
-      before_fetch :cancel_if_server_too_busy
+      fetch_started :cancel_if_server_too_busy
       after_fetch_update :save_image_dimensions
       after_fetch_error :report_problem
       after_fetch_redirect :save_url_alias

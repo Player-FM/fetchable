@@ -8,6 +8,8 @@ class InheritanceTest < ActiveSupport::TestCase
     quote.expects(:handle_historical_quote)
     quote.fetch
     assert_equal 200, quote.status_code
+    assert quote.store_key =~ /^\/tmp\/quotes/
+    assert File.exist?(quote.store_key), "no file at #{quote.store_key}"
   end
 
 end
