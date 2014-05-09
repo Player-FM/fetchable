@@ -10,22 +10,24 @@ module Fetchable
   extend ActiveSupport::Concern
 
   module ClassMethods
+
     def setup(options={})
-      @fetchable_settings = Hashie::Mash.new(options)
-      @fetchable_callbacks = Hashie::Mash.new
+      self.fetchable_settings = Hashie::Mash.new(options)
+      self.fetchable_callbacks = Hashie::Mash.new
       %w(before_fetch after_fetch after_fetch_change after_refetch after_fetch_redirect after_fetch_error).each { |event|
-        @fetchable_callbacks[event]=[]
+        self.fetchable_callbacks[event]=[]
         define_singleton_method(event.to_sym) { |handler| self.fetchable_callbacks[event] << handler }
       }
     end
-    def fetchable_settings ; @fetchable_settings ; end
-    def fetchable_callbacks ; @fetchable_callbacks ; end
     def ready_for_fetch
       where('? >= next_fetch_after', DateTime.now).order(:next_fetch_after)
     end
   end
 
   included do
+
+    class_attribute :fetchable_settings
+    class_attribute :fetchable_callbacks
 
     serialize :redirect_chain
     validate :url, :validate_url_string
@@ -70,12 +72,12 @@ module Fetchable
         self.next_fetch_after = now + scheduler.next_fetch_wait(self)
       end
 
+      self.call_fetchable_callbacks_based_on_response(response)
+      self.save!
+
       if response.status!=304 and store = self.class.fetchable_settings[:store]
         store.save_content(self, response, now, options)
       end
-
-      self.call_fetchable_callbacks_based_on_response(response)
-      self.save!
 
     end
     

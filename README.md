@@ -115,7 +115,7 @@ Create or update your model using the "fetchable\_attribs" migration helper demo
     # Make existing model fetchable
     class UpdateDocuments < ActiveRecord::Migration
       def change
-        add_fetchable_attribs(:documents)
+        add_fetchable_attribs :documents
       end
     end
 
