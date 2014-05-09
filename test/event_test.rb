@@ -22,6 +22,7 @@ class EventTest < ActiveSupport::TestCase
 
     greeting.url = Dummy::test_file(name: 'farewell.txt', last_modified: '_')
     greeting.expects(:handle_fetch_changed)
+    greeting.expects(:handle_fetch_changed_and_ended)
     greeting.fetch
   end
 
@@ -47,6 +48,7 @@ class EventTest < ActiveSupport::TestCase
     greeting.expects(:handle_fetch_started)
     greeting.expects(:handle_fetch_ended)
     greeting.expects(:handle_fetch_changed).never
+    greeting.expects(:handle_fetch_changed_and_ended).never
     greeting.fetch
   end
 

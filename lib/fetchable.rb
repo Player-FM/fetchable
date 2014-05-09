@@ -14,7 +14,7 @@ module Fetchable
     def setup(options={})
       self.fetchable_settings = Hashie::Mash.new(options)
       self.fetchable_callbacks = Hashie::Mash.new
-      %w(fetch_started fetch_changed fetch_redirected fetch_failed fetch_ended).each { |event|
+      %w(fetch_started fetch_changed fetch_redirected fetch_failed fetch_changed_and_ended fetch_ended).each { |event|
         self.fetchable_callbacks[event]=[]
         define_singleton_method(event.to_sym) { |handler| self.fetchable_callbacks[event] << handler }
       }
@@ -73,12 +73,14 @@ module Fetchable
       end
 
       self.call_fetchable_callbacks_based_on_response(response)
+      self_changed = self.fingerprint_changed?
       self.save!
 
       if response.status!=304 and store = self.class.fetchable_settings[:store]
         store.save_content(self, response, now, options)
       end
 
+      self.call_fetchable_callbacks :fetch_changed_and_ended if self_changed
       self.call_fetchable_callbacks :fetch_ended
 
     end
