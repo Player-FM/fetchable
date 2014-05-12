@@ -20,8 +20,15 @@ module Fetchable
       self.fetchable_settings = Hashie::Mash.new(options)
       self.fetchable_callbacks = Hashie::Mash.new
       %w(fetch_started fetch_changed fetch_redirected fetch_failed fetch_changed_and_ended fetch_ended).each { |event|
-        self.fetchable_callbacks[event]=[]
-        define_singleton_method(event.to_sym) { |handler| self.fetchable_callbacks[event] += [handler] }
+        # This is complicated because we need to make sure subclass will not override superclass attribute
+        # See http://apidock.com/rails/Class/class_attribute#1332-To-use-class-attribute-with-a-hash
+        # Additionally, our data structure is a hash of lists, so we need some extra fudging around
+        define_singleton_method(event.to_sym) { |handler|
+          callbacks_for_event = self.fetchable_callbacks[event] || []
+          update_to_callbacks = {}
+          update_to_callbacks[event] = callbacks_for_event+[handler]
+          self.fetchable_callbacks = self.fetchable_callbacks.merge (update_to_callbacks)
+        }
       }
 
     end
@@ -56,12 +63,14 @@ module Fetchable
 
     def call_fetchable_callbacks(event)
       vetoed = false
-      self.class.fetchable_callbacks[event].each { |callback|
-        if self.send(callback)==false
-          vetoed = true
-          break
-        end
-      }
+      if callbacks_for_this_event = self.class.fetchable_callbacks[event]
+        callbacks_for_this_event.each { |callback|
+          if self.send(callback)==false
+            vetoed = true
+            break
+          end
+        }
+      end
       vetoed
     end
 

@@ -15,7 +15,9 @@ class InheritanceTest < ActiveSupport::TestCase
 
   # see https://coderwall.com/p/xhcmbg
   def test_subclass_callbacks_dont_bleed_into_superclass
+    assert_not_equal Quote.fetchable_callbacks, HistoricalQuote.fetchable_callbacks
     quote = Quote.new(url: QUOTE_URL)
+    assert_equal quote.fetchable_callbacks, Quote.fetchable_callbacks
     quote.expects(:handle_historical_quote).never
     quote.fetch
   end
