@@ -46,10 +46,10 @@ module Fetchable
   included do
 
     serialize :redirect_chain
-    validate :url, :validate_url_string
+    validate :validate_url_string
     attr_reader :body
     def validate_url_string
-      if url.present? && url !~ URI::regexp
+      if self.attributes.include?(:url) and url.present? and url !~ URI::regexp
         errors.add(:url, "isn't a valid URL")
       end
     end
