@@ -49,6 +49,7 @@ module Fetchable
     validate :validate_url_string
     attr_reader :body
     def validate_url_string
+      # this includes a check of attributes to avoid problems during migration
       if self.attributes.include?(:url) and url.present? and url !~ URI::regexp
         errors.add(:url, "isn't a valid URL")
       end
