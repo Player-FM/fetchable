@@ -11,23 +11,32 @@ module Fetchable
 
   module ClassMethods
 
-    def setup(options={})
+    def acts_as_fetchable(options={})
+
+      # class_attribute usage modelled on acts_as_commentable: bit.ly/1iIj6VA 
+      class_attribute :fetchable_settings
+      class_attribute :fetchable_callbacks
+
       self.fetchable_settings = Hashie::Mash.new(options)
       self.fetchable_callbacks = Hashie::Mash.new
       %w(fetch_started fetch_changed fetch_redirected fetch_failed fetch_changed_and_ended fetch_ended).each { |event|
         self.fetchable_callbacks[event]=[]
-        define_singleton_method(event.to_sym) { |handler| self.fetchable_callbacks[event] << handler }
+        define_singleton_method(event.to_sym) { |handler| self.fetchable_callbacks[event] += [handler] }
       }
+
     end
+
+    def fetchable_options(options={})
+      self.fetchable_settings = self.fetchable_settings.merge(options)
+    end
+
     def ready_for_fetch
       where('? >= next_fetch_after', DateTime.now).order(:next_fetch_after)
     end
+
   end
 
   included do
-
-    class_attribute :fetchable_settings
-    class_attribute :fetchable_callbacks
 
     serialize :redirect_chain
     validate :url, :validate_url_string
@@ -157,9 +166,4 @@ module Fetchable
 
 end
 
-class ActiveRecord::Base
-  def self.acts_as_fetchable(options={})
-    include Fetchable
-    setup(options)
-  end
-end
+ActiveRecord::Base.send(:include, Fetchable)
