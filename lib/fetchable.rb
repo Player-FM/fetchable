@@ -48,6 +48,7 @@ module Fetchable
     serialize :redirect_chain
     validate :validate_url_string
     attr_reader :body
+
     def validate_url_string
       # this includes a check of attributes to avoid problems during migration
       if self.attributes.include?(:url) and url.present? and url !~ URI::regexp
@@ -99,8 +100,9 @@ module Fetchable
         store.save_content(self, response, now, options)
       end
 
-      self.call_fetchable_callbacks :fetch_changed_and_ended if self_changed
-      self.call_fetchable_callbacks :fetch_ended
+      @fetch_result = Hashie::Mash.new(response: response)
+      self.call_fetchable_callbacks(:fetch_changed_and_ended) if self_changed
+      self.call_fetchable_callbacks(:fetch_ended)
 
     end
     
