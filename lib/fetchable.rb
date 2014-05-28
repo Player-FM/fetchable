@@ -61,7 +61,10 @@ module Fetchable
     def failed? ; self.fetch_fail_count > 0 ; end
     def redirected_to ; self.redirect_chain.last[:url] if self.redirect_chain ; end
     def content_type ; self.received_content_type || self.inferred_content_type ; end
-    def purge_mementos ; self.update_attributes(etag: nil, last_modified: nil) ; end
+    # this will force a fresh call
+    def purge_call_mementos ; self.update_attributes(etag: nil, last_modified: nil) ; end
+    # this will not just force a fresh call, but also force change handlers to be called even if the response is still the same
+    def purge_mementos ; self.update_attributes(etag: nil, last_modified: nil, fingerprint: nil) ; end
 
     def call_fetchable_callbacks(event)
       vetoed = false
@@ -83,7 +86,10 @@ module Fetchable
     def fetch(options={})
 
       self.call_fetchable_callbacks :fetch_started
-      options = Hashie::Mash.new(options.reverse_merge(redirect_limit: 5))
+
+      options = Hashie::Mash.new(options.reverse_merge(redirect_limit: 5, force: false))
+      #self.purge_mementos if options.force
+
       response, options, redirect_chain = Fetchable::Fetcher.deep_fetch(self, self.url, [], options)
       now = DateTime.now
       self.assign_from_rest_response(response, options, redirect_chain, now)

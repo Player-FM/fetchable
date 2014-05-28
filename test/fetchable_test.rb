@@ -60,14 +60,13 @@ class FetchableTest < ActiveSupport::TestCase
     end
 
     Timecop.freeze(start+5.minutes) do
-      greeting.purge_mementos
-      greeting.fetch
+      greeting.etag = greeting.last_modified = nil
       assert_equal start, greeting.fetch_changed_at
     end
 
     Timecop.freeze(start+10.minutes) do
       greeting.url = Dummy::test_file(name: 'farewell.txt')
-      greeting.purge_mementos
+      greeting.etag = greeting.last_modified = nil
       greeting.fetch
       assert_equal start+10.minutes, greeting.fetch_changed_at
     end
