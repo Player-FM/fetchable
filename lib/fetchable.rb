@@ -85,30 +85,38 @@ module Fetchable
 
     def fetch(options={})
 
-      self.call_fetchable_callbacks :fetch_started
+      begin
 
-      options = Hashie::Mash.new(options.reverse_merge(redirect_limit: 5, force: false))
-      self.purge_mementos if options.force
+        self.call_fetchable_callbacks :fetch_started
 
-      response, options, redirect_chain = Fetchable::Fetcher.deep_fetch(self, self.url, [], options)
-      now = DateTime.now
-      self.assign_from_rest_response(response, options, redirect_chain, now)
+        options = Hashie::Mash.new(options.reverse_merge(redirect_limit: 5, force: false))
+        self.purge_mementos if options.force
+
+        response, options, redirect_chain = Fetchable::Fetcher.deep_fetch(self, self.url, [], options)
+        now = DateTime.now
+        self.assign_from_rest_response(response, options, redirect_chain, now)
+
+        self.call_fetchable_callbacks_based_on_response(response)
+        self_changed = self.fingerprint_changed?
+        self.save!
+
+        if response.status!=304 and store = self.class.fetchable_settings[:store]
+          store.save_content(self, response, now, options)
+        end
+
+        @fetch_result = Hashie::Mash.new(response: response)
+        self.call_fetchable_callbacks(:fetch_changed_and_ended) if self_changed
+        self.call_fetchable_callbacks(:fetch_ended)
+
+      rescue => ex
+
+        Rails.logger.error("Fetchable error", ex)
+
+      end          
 
       if scheduler = self.class.fetchable_settings.scheduler
-        self.next_fetch_after = now + scheduler.next_fetch_wait(self)
+        self.update_attributes next_fetch_after: now + scheduler.next_fetch_wait(self)
       end
-
-      self.call_fetchable_callbacks_based_on_response(response)
-      self_changed = self.fingerprint_changed?
-      self.save!
-
-      if response.status!=304 and store = self.class.fetchable_settings[:store]
-        store.save_content(self, response, now, options)
-      end
-
-      @fetch_result = Hashie::Mash.new(response: response)
-      self.call_fetchable_callbacks(:fetch_changed_and_ended) if self_changed
-      self.call_fetchable_callbacks(:fetch_ended)
 
     end
     
