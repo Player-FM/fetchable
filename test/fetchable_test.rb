@@ -115,4 +115,9 @@ class FetchableTest < ActiveSupport::TestCase
 
   end
 
+  def test_exception_is_handlerd
+    greeting.url = nil
+    greeting.fetch
+  end
+
 end

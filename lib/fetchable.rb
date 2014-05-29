@@ -85,6 +85,8 @@ module Fetchable
 
     def fetch(options={})
 
+      now = DateTime.now
+
       begin
 
         self.call_fetchable_callbacks :fetch_started
@@ -93,7 +95,6 @@ module Fetchable
         self.purge_mementos if options.force
 
         response, options, redirect_chain = Fetchable::Fetcher.deep_fetch(self, self.url, [], options)
-        now = DateTime.now
         self.assign_from_rest_response(response, options, redirect_chain, now)
 
         self.call_fetchable_callbacks_based_on_response(response)
@@ -110,7 +111,7 @@ module Fetchable
 
       rescue => ex
 
-        Rails.logger.error("Fetchable error", ex)
+        Rails.logger.error("Fetchable error #{ex}\n#{ex.backtrace.join("\n")}")
 
       end          
 
