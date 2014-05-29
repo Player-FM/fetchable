@@ -88,7 +88,7 @@ module Fetchable
       self.call_fetchable_callbacks :fetch_started
 
       options = Hashie::Mash.new(options.reverse_merge(redirect_limit: 5, force: false))
-      #self.purge_mementos if options.force
+      self.purge_mementos if options.force
 
       response, options, redirect_chain = Fetchable::Fetcher.deep_fetch(self, self.url, [], options)
       now = DateTime.now
