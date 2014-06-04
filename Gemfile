@@ -12,4 +12,4 @@ gemspec
 
 # To use debugger
 # gem 'debugger'
-gem 'rake'
+gem 'rake', "~> 10.3.0"
