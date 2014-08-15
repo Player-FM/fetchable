@@ -8,7 +8,6 @@ module Fetchable
 
       def initialize(settings={})
         settings = Hashie::Mash.new(settings)
-        #byebug
         @folder = settings.folder # we have to defer the default as Rails.root doesn't exist yet
         @name_prefix = settings.name_prefix || "res"
         @subfolder_amount = settings.subfolder_amount || 1000

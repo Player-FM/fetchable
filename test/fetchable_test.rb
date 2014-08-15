@@ -23,7 +23,6 @@ class FetchableTest < ActiveSupport::TestCase
   def test_attribs
     Timecop.freeze(now) do
       farewell = Document.create(url: Dummy::test_file(name: 'farewell.txt'))
-      farewell.fetch
       assert_equal 200, farewell.status_code
       assert_equal FAREWELL_ETAG, farewell.etag
       assert_equal FAREWELL_SIZE, farewell.size
@@ -79,45 +78,6 @@ class FetchableTest < ActiveSupport::TestCase
     assert_equal 200, greeting.status_code
     assert_equal nil, greeting.etag
     assert_equal nil, greeting.last_modified
-  end
-
-  def test_attribs_after_error_response
-    assert_nil greeting.fetch_succeeded_at
-    start = now + 10.minutes
-    Timecop.freeze(start) do
-      greeting.url = Dummy::test_file(name: 'does-not-exist')
-      greeting.fetch
-      assert_equal 404, greeting.status_code
-      assert_equal 1, greeting.fetch_fail_count
-      assert_equal start, greeting.fetch_tried_at
-      assert_nil greeting.fetch_succeeded_at
-      greeting.fetch
-      assert_equal 2, greeting.fetch_fail_count
-    end
-  end
-
-  def test_error_doesnt_wipe_out_attribs_from_last_successful_call
-
-    original = nil
-    Timecop.freeze(start = now) do
-      greeting.fetch
-      original = greeting.clone
-    end
-
-    Timecop.freeze(later = now+5.hours) do
-      greeting.url = Dummy::test_file(name: 'does-not-exist')
-      greeting.fetch
-      assert_equal start, greeting.fetch_succeeded_at
-      assert_equal later, greeting.fetch_tried_at
-      assert_equal original.fingerprint, greeting.fingerprint
-      assert_equal original.etag, greeting.etag
-    end
-
-  end
-
-  def test_exception_is_handlerd
-    greeting.url = nil
-    greeting.fetch
   end
 
 end

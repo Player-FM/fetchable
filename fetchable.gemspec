@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   s.add_dependency "hashie", "~> 2.0.0"
   s.add_dependency "excon", "~> 0.33.0"
 
-  %w(sqlite3 addressable byebug single_test timecop mocha)
+  %w(sqlite3 addressable single_test timecop mocha)
   .each { |lib| s.add_development_dependency lib }
 
 end

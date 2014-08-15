@@ -1,7 +1,6 @@
 require 'hashie'
 require 'net/http'
 require 'excon'
-require 'byebug'
 project_root = File.dirname(File.absolute_path(__FILE__))
 Dir.glob(project_root + '/fetchable/**/*.rb', &method(:require))
 
@@ -91,7 +90,7 @@ module Fetchable
 
         self.call_fetchable_callbacks :fetch_started
 
-        options = Hashie::Mash.new(options.reverse_merge(redirect_limit: 5, force: false))
+        options = Hashie::Mash.new(redirect_limit: 5, force: false).merge(options)
         self.purge_mementos if options.force
 
         response, options, redirect_chain = Fetchable::Fetcher.deep_fetch(self, self.url, [], options)
