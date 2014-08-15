@@ -23,6 +23,7 @@ class FetchableTest < ActiveSupport::TestCase
   def test_attribs
     Timecop.freeze(now) do
       farewell = Document.create(url: Dummy::test_file(name: 'farewell.txt'))
+      farewell.fetch
       assert_equal 200, farewell.status_code
       assert_equal FAREWELL_ETAG, farewell.etag
       assert_equal FAREWELL_SIZE, farewell.size

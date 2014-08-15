@@ -1,4 +1,5 @@
 require 'optparse'
+require 'hashie'
 
 module Fetchable
   module Runners
