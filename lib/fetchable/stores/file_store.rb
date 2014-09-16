@@ -4,6 +4,12 @@ module Fetchable
 
     class FileStore
 
+      # these take priority before delegating to MIME::Types
+      PREFERRED_EXTENSIONS = {
+        'image/jpeg' => 'jpeg',
+        'text/plain' => 'txt'
+      }
+
       attr_accessor :folder, :name_prefix 
 
       def initialize(settings={})
@@ -32,12 +38,16 @@ module Fetchable
       end
 
       def self.determine_extension(fetchable)
-        types = MIME::Types[fetchable.received_content_type]
-        types = MIME::Types[fetchable.inferred_content_type] if types.blank?
-        if types and types.first and extension = types.first.extensions[0]
-          ".#{extension}"
+        if preferred_extension = PREFERRED_EXTENSIONS[fetchable.received_content_type] || PREFERRED_EXTENSIONS[fetchable.inferred_content_type]
+          ".#{preferred_extension}"
         else
-          ''
+          types = MIME::Types[fetchable.received_content_type]
+          types = MIME::Types[fetchable.inferred_content_type] if types.blank?
+          if types and types.first and extension = types.first.extensions[0]
+            ".#{extension}"
+          else
+            ''
+          end
         end
       end
 

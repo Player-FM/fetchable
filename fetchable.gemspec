@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails", "~> 4.1.0"
   s.add_dependency "hashie", "~> 2.0.0"
-  s.add_dependency "excon", "~> 0.33.0"
+  s.add_dependency "excon"
 
   %w(sqlite3 addressable single_test timecop mocha)
   .each { |lib| s.add_development_dependency lib }
