@@ -13,7 +13,7 @@ module Fetchable
       [:size, :integer],
       [:etag, :string],
       [:fingerprint, :string],
-      [:redirect_chain, :string],
+      [:redirect_chain, :text],
       [:permanent_redirect_url, :string],
       [:received_content_type, :string],
       [:inferred_content_type, :string],
