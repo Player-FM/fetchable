@@ -26,7 +26,7 @@ module Fetchable
       [:fetch_tried_at, :datetime],
       [:fetch_succeeded_at, :datetime],
       [:fetch_changed_at, :datetime],
-      [:next_fetch_after, :datetime, limit: 3, default: DateTime.new(1970)],
+      [:next_fetch_after, :datetime, limit: 3],
 
     ]
 
