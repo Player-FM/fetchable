@@ -4,7 +4,7 @@ module Fetchable
   module MigrationHelper
 
     # http://www.mikeperham.com/2014/05/17/setting-mysql-datetime-column-defaults-in-rails/
-    DEFAULT_TIMESTAMP = 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP'
+    DEFAULT_TIMESTAMP = "DATETIME NOT NULL DEFAULT #{DateTime.new(1970).to_s(:db)}"
 
     COLUMNS = [
 
