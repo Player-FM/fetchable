@@ -18,7 +18,7 @@ module Fetchable
         connect_timeout: options.connect_timeout
       }
 
-      if [301,302].include?(resp.status) and redirect_chain.size <= options.redirect_limit
+      if [301,302,303].include?(resp.status) and redirect_chain.size <= options.redirect_limit
         new_url = resp.headers['location']
         if URI.parse(new_url).relative?
           old_url = Addressable::URI.parse(url)
