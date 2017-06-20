@@ -18,6 +18,19 @@ module Fetchable
         connect_timeout: options.connect_timeout
       }
 
+      # second chance if failed
+      # try without headers this time
+      # (particularly because there seems to be a side
+      # effect of headers hash -
+      # https://github.com/excon/excon/issues/633)
+      if (400...499).include?(resp.status)
+        resp = Excon.get url, {
+          omit_default_port: true,
+          read_timeout: options.read_timeout,
+          connect_timeout: options.connect_timeout
+        }
+      end
+
       if [301,302,303].include?(resp.status) and redirect_chain.size <= options.redirect_limit
         new_url = resp.headers['location']
         if URI.parse(new_url).relative?
