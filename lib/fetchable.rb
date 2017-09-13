@@ -108,11 +108,11 @@ module Fetchable
         self.call_fetchable_callbacks(:fetch_changed_and_ended) if self_changed
         self.call_fetchable_callbacks(:fetch_ended)
 
-      rescue => ex
+      #rescue => ex
 
-        Rails.logger.error("Fetchable error #{ex}\n#{ex.backtrace.join("\n")}")
+        #Rails.logger.error("Fetchable error #{ex}\n#{ex.backtrace.join("\n")}")
 
-      end          
+      end
 
       if scheduler = self.class.fetchable_settings.scheduler
         self.update_attributes next_fetch_after: now + scheduler.next_fetch_wait(self)
