@@ -90,7 +90,7 @@ module Fetchable
 
         self.call_fetchable_callbacks :fetch_started
 
-        options = Hashie::Mash.new(redirect_limit: 5, force: false).merge(options)
+        options = Hashie::Mash.new(save: true, redirect_limit: 5, force: false).merge(options)
         self.purge_mementos if options.force
 
         response, options, redirect_chain = Fetchable::Fetcher.deep_fetch(self, self.url, [], options)
@@ -98,9 +98,9 @@ module Fetchable
 
         self.call_fetchable_callbacks_based_on_response(response)
         self_changed = self.fingerprint_changed?
-        self.save!
+        self.save! if options.save
 
-        if response.status!=304 and store = self.class.fetchable_settings[:store]
+        if options.save && response.status!=304 and store = self.class.fetchable_settings[:store]
           store.save_content(self, response, now, options)
         end
 
@@ -115,7 +115,8 @@ module Fetchable
       end
 
       if scheduler = self.class.fetchable_settings.scheduler
-        self.update_attributes next_fetch_after: now + scheduler.next_fetch_wait(self)
+        self.next_fetch_after = now + scheduler.next_fetch_wait(self)
+        self.save! if options.save
       end
 
     end

@@ -1,3 +1,8 @@
+# Run one test file:
+#    rake test TEST=test/fetchable_test.rb
+# Run one test method:
+#   ruby -I"lib:test" test/fetchable_test.rb -n test_suppress_saving
+
 begin
   require 'bundler/setup'
 rescue LoadError

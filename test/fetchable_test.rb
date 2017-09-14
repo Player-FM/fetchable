@@ -24,6 +24,7 @@ class FetchableTest < ActiveSupport::TestCase
     Timecop.freeze(now) do
       farewell = Document.create(url: Dummy::test_file(name: 'farewell.txt'))
       farewell.fetch
+      farewell.reload
       assert_equal 200, farewell.status_code
       assert_equal FAREWELL_ETAG, farewell.etag
       assert_equal FAREWELL_SIZE, farewell.size
@@ -34,6 +35,15 @@ class FetchableTest < ActiveSupport::TestCase
       assert_equal now, farewell.fetch_tried_at
       assert_equal now, farewell.fetch_succeeded_at
     end
+  end
+
+  def test_suppress_saving
+      farewell = Document.create(url: Dummy::test_file(name: 'farewell.txt'))
+      assert_nil farewell.status_code
+      farewell.fetch save: false
+      assert_equal 200, farewell.status_code
+      farewell.reload
+      assert_nil farewell.status_code
   end
 
   def test_validate_url
