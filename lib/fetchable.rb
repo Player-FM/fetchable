@@ -61,9 +61,16 @@ module Fetchable
     def redirected_to ; self.redirect_chain.last[:url] if self.redirect_chain ; end
     def content_type ; self.received_content_type || self.inferred_content_type ; end
     # this will force a fresh call
-    def purge_call_mementos ; self.update_attributes(etag: nil, last_modified: nil) ; end
+    def purge_call_mementos
+      self.assign_attributes(etag: nil, last_modified: nil)
+      self.save
+    end
     # this will not just force a fresh call, but also force change handlers to be called even if the response is still the same
-    def purge_mementos ; self.update_attributes(etag: nil, last_modified: nil, fingerprint: nil) ; end
+    def purge_mementos
+      # We are not using 'update_attributes' or rails 6 'update' method here because 'update_attributes' is deprecated and rails 6 'update' method is new and we don't want to force a rails 6 dependency.
+      self.assign_attributes(etag: nil, last_modified: nil, fingerprint: nil)
+      self.save
+    end
 
     def call_fetchable_callbacks(event)
       vetoed = false
